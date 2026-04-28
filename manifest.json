@@ -1,0 +1,13 @@
+{
+  "name": "LifeOS",
+  "short_name": "LifeOS",
+  "description": "Calendar, todos, and notes — powered by Google Sheets",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#F2F2F7",
+  "theme_color": "#007AFF",
+  "orientation": "any",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
