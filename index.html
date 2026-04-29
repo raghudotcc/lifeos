@@ -566,6 +566,56 @@ body {
 .rb-close:hover { opacity: 1; }
 @keyframes rb-in { from { transform: translateX(-50%) translateY(-120%); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
 .reminder-banner + .reminder-banner { top: calc(env(safe-area-inset-top, 12px) + 70px); }
+
+/* ── MARKDOWN CONTENT ──────────────────────────────────────────────── */
+.item-text { white-space: normal; }
+.md-h1 { display: block; font-size: 1.08em; font-weight: 700; margin-bottom: 1px; }
+.md-h2 { display: block; font-weight: 700; margin-bottom: 1px; }
+.md-h3 { display: block; font-weight: 600; }
+.md-li { display: block; padding-left: 1.1em; text-indent: -1.1em; margin-top: 1px; }
+.md-q  { display: block; border-left: 2px solid var(--t3); padding-left: 8px; color: var(--t2); margin: 2px 0; }
+.md-br { display: block; height: .45em; }
+.md-code { font-family: 'Cascadia Code','Consolas',monospace; background: var(--bg2); padding: 1px 5px; border-radius: 3px; font-size: .88em; }
+.md-link { color: var(--acc); text-decoration: underline; cursor: pointer; }
+.item-text strong { font-weight: 700; }
+.item-text em { font-style: italic; }
+
+/* ── COMMAND PALETTE ────────────────────────────────────────────────── */
+.cmd-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 19999; backdrop-filter: blur(3px); }
+.cmd-overlay.open { display: block; animation: fadein .12s; }
+.cmd-palette {
+  position: fixed; top: 14vh; left: 50%; transform: translateX(-50%);
+  width: min(560px, 93vw); background: var(--bg1); border: 1px solid var(--bd2);
+  box-shadow: 0 28px 70px rgba(0,0,0,.9); z-index: 20000;
+  display: flex; flex-direction: column; max-height: 62vh;
+  animation: popin .16s cubic-bezier(.34,1.56,.64,1);
+}
+.cmd-input-wrap { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--bd); flex-shrink: 0; }
+.cmd-search-ic { width: 16px; height: 16px; color: var(--t3); flex-shrink: 0; }
+#cmd-input { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: var(--t1); font-family: inherit; }
+#cmd-input::placeholder { color: var(--t3); }
+.cmd-hint { font-size: 11px; color: var(--t3); white-space: nowrap; font-family: monospace; }
+.cmd-results { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.cmd-section-label { padding: 8px 14px 3px; font-size: 10px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .7px; }
+.cmd-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; cursor: pointer; transition: background .08s; }
+.cmd-row:hover, .cmd-row.focused { background: var(--acc-bg); color: var(--acc); }
+.cmd-icon-box { width: 26px; height: 26px; border-radius: 5px; background: var(--bg2); border: 1px solid var(--bd); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--t2); flex-shrink: 0; font-family: monospace; }
+.cmd-row:hover .cmd-icon-box, .cmd-row.focused .cmd-icon-box { border-color: var(--acc); color: var(--acc); background: var(--acc-bg); }
+.cmd-row-label { font-size: 13px; font-weight: 500; color: var(--t1); flex: 1; }
+.cmd-row-sub { font-size: 11px; color: var(--t3); }
+.cmd-type-badge { width: 26px; height: 26px; border-radius: 5px; border: 1px solid; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.cmd-type-badge.note  { border-color: var(--note);  color: var(--note);  background: var(--note-bg); }
+.cmd-type-badge.todo  { border-color: var(--todo);  color: var(--todo);  background: var(--todo-bg); }
+.cmd-type-badge.event { border-color: var(--event); color: var(--event); background: var(--event-bg); }
+.cmd-item-text { flex: 1; min-width: 0; }
+.cmd-item-content { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--t1); }
+.cmd-item-meta { display: block; font-size: 10px; color: var(--t3); margin-top: 1px; }
+.cmd-sep { height: 1px; background: var(--bd); }
+.cmd-empty { padding: 20px 14px; font-size: 13px; color: var(--t3); text-align: center; }
+
+/* ── DAY PANEL SCROLL ──────────────────────────────────────────────── */
+.dp-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+
 </style>
 </head>
 <body>
@@ -601,6 +651,7 @@ body {
     <div class="hdr-tabs" id="hdr-tabs"></div>
     <div class="hdr-actions">
       <button class="hdr-new-btn" onclick="openModal()" title="New item (N)">+ New</button>
+      <button class="icon-btn" onclick="openCmd()" title="Search (⌘K)"><svg class="cmd-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
       <button class="icon-btn" id="sync-btn" onclick="syncNow()" title="Sync">↻</button>
       <button class="avatar-btn" id="hdr-avatar" onclick="openSettings()" title="Settings">⚙</button>
     </div>
@@ -783,6 +834,18 @@ body {
     </div>
   </div>
   <div class="set-version">LifeOS · Open source</div>
+</div>
+
+
+<!-- COMMAND PALETTE -->
+<div class="cmd-overlay" id="cmd-overlay" onclick="closeCmd()"></div>
+<div class="cmd-palette" id="cmd-palette" style="display:none">
+  <div class="cmd-input-wrap">
+    <svg class="cmd-search-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="cmd-input" placeholder="Search items, go to date, switch view…" autocomplete="off" spellcheck="false">
+    <span class="cmd-hint">ESC to close</span>
+  </div>
+  <div class="cmd-results" id="cmd-results"></div>
 </div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -1309,7 +1372,7 @@ const itemHTML = item => {
   <div class="item-row${done?' done':''}" data-id="${item.id}">
     ${att?.type==='image' ? `<img class="item-thumb" src="${att.thumb}" alt="" onclick="showLightbox('${att.id}')">` : left}
     <div class="item-body">
-      <div class="item-text">${esc(item.content)}</div>
+      <div class="item-text">${md(item.content)}</div>
       <div class="item-sub">
         ${item.time ? `<span class="item-time">${fmtTime(item.time)}</span>` : ''}
         <span class="badge ${item.type}" data-badge="${item.id}">${item.type}</span>
@@ -2248,12 +2311,224 @@ setInterval(() => {
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
+
+// ══════════════════════════════════════════════════════════════════
+// MARKDOWN RENDERER — minimal subset, safe (escapes before applying)
+// ══════════════════════════════════════════════════════════════════
+const inline = s => {
+  let h = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  h = h.replace(/\*\*(.+?)\*\*/g,       '<strong>$1</strong>');
+  h = h.replace(/\*(.+?)\*/g,            '<em>$1</em>');
+  h = h.replace(/`(.+?)`/g,              '<code class="md-code">$1</code>');
+  h = h.replace(/(https?:\/\/[^\s<&]+)/g, '<a href="$1" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="md-link">$1</a>');
+  return h;
+};
+const md = raw => {
+  if (!raw) return '';
+  return raw.split('\n').map(line => {
+    let m;
+    if (m = line.match(/^> (.*)/))       return `<span class="md-q">${inline(m[1])}</span>`;
+    if (m = line.match(/^### (.*)/))     return `<span class="md-h3">${inline(m[1])}</span>`;
+    if (m = line.match(/^## (.*)/))      return `<span class="md-h2">${inline(m[1])}</span>`;
+    if (m = line.match(/^# (.*)/))       return `<span class="md-h1">${inline(m[1])}</span>`;
+    if (m = line.match(/^[-*+] (.*)/))   return `<span class="md-li">•\u2009${inline(m[1])}</span>`;
+    if (m = line.match(/^(\d+)\. (.*)/)) return `<span class="md-li">${m[1]}.\u2009${inline(m[2])}</span>`;
+    if (line === '')                      return '<span class="md-br"></span>';
+    return `<span>${inline(line)}</span>`;
+  }).join('');
+};
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-BULLETS — continue list on Enter, Tab to indent
+// ══════════════════════════════════════════════════════════════════
+const initAutoBullet = () => {
+  const ta = $('m-content'); if (!ta || ta._bulletInited) return;
+  ta._bulletInited = true;
+
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const pos    = ta.selectionStart;
+      const before = ta.value.slice(0, pos);
+      const after  = ta.value.slice(pos);
+      const lines  = before.split('\n');
+      const cur    = lines[lines.length - 1];
+      const m      = cur.match(/^(\s*)([-*+]|\d+\.)\s(.*)$/);
+      if (!m) return;
+      e.preventDefault();
+      const [, indent, marker, content] = m;
+      if (!content.trim()) {
+        // Empty bullet → exit list (remove the bullet prefix)
+        const newBefore = before.slice(0, before.length - cur.length);
+        ta.value = newBefore + after;
+        ta.selectionStart = ta.selectionEnd = newBefore.length;
+      } else {
+        const next = /^\d+/.test(marker) ? (parseInt(marker) + 1) + '.' : marker;
+        const ins  = '\n' + indent + next + ' ';
+        ta.value = before + ins + after;
+        ta.selectionStart = ta.selectionEnd = pos + ins.length;
+      }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const pos    = ta.selectionStart;
+      const before = ta.value.slice(0, pos);
+      const after  = ta.value.slice(pos);
+      const lines  = before.split('\n');
+      const cur    = lines[lines.length - 1];
+      if (cur.match(/^\s*([-*+]|\d+\.)/)) {
+        const lineStart = before.length - cur.length;
+        if (e.shiftKey) {
+          // Unindent: remove up to 2 leading spaces
+          const stripped = cur.replace(/^ {1,2}/, '');
+          ta.value = before.slice(0, lineStart) + stripped + after;
+          ta.selectionStart = ta.selectionEnd = lineStart + stripped.length - (after.length === ta.value.length - lineStart - stripped.length ? 0 : 0);
+        } else {
+          // Indent: add 2 spaces
+          ta.value = before.slice(0, lineStart) + '  ' + cur + after;
+          ta.selectionStart = ta.selectionEnd = pos + 2;
+        }
+      } else {
+        // Not on bullet — insert 2 spaces
+        ta.value = before + '  ' + after;
+        ta.selectionStart = ta.selectionEnd = pos + 2;
+      }
+    }
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════
+// COMMAND PALETTE
+// ══════════════════════════════════════════════════════════════════
+const CMD = [];  // registered action functions, indexed by position in results
+
+const openCmd = () => {
+  $('cmd-overlay').classList.add('open');
+  const pal = $('cmd-palette');
+  pal.style.removeProperty('display');
+  setTimeout(() => { $('cmd-input').value = ''; renderCmd(''); $('cmd-input').focus(); }, 20);
+};
+
+const closeCmd = () => {
+  $('cmd-overlay').classList.remove('open');
+  const pal = $('cmd-palette');
+  pal.style.display = 'none';
+};
+
+const renderCmd = q => {
+  CMD.length = 0;
+  const query = q.toLowerCase().trim();
+  const rows  = [];
+
+  // ── Static actions ────────────────────────────────────────────
+  const actions = [
+    { i: '+',  l: 'New item',    s: 'Note, todo or event',  f: () => openModal() },
+    { i: '◎',  l: 'Today',       s: ds(today()),             f: () => goToday() },
+    { i: 'M',  l: 'Month view',  s: 'Calendar',              f: () => { setCalMode('month'); switchView('cal'); } },
+    { i: 'W',  l: 'Week view',   s: 'Calendar',              f: () => { setCalMode('week');  switchView('cal'); } },
+    { i: 'D',  l: 'Day view',    s: 'Calendar',              f: () => { setCalMode('day');   switchView('cal'); } },
+    { i: '≡',  l: 'List view',   s: 'All items',             f: () => switchView('list') },
+    { i: '⚙',  l: 'Settings',   s: 'Profile & preferences', f: () => openSettings() },
+  ].filter(a => !query || a.l.toLowerCase().includes(query) || a.s.toLowerCase().includes(query));
+
+  if (actions.length) {
+    rows.push('<div class="cmd-section-label">Actions</div>');
+    actions.forEach(a => {
+      const idx = CMD.push(a.f) - 1;
+      rows.push(`<div class="cmd-row" data-cmd="${idx}">
+        <div class="cmd-icon-box">${a.i}</div>
+        <span class="cmd-row-label">${esc(a.l)}</span>
+        <span class="cmd-row-sub">${esc(a.s)}</span>
+      </div>`);
+    });
+  }
+
+  // ── Item search ───────────────────────────────────────────────
+  if (query) {
+    const hits = S.items
+      .filter(i => i.content.toLowerCase().includes(query) || (i.date && i.date.includes(query)))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 8);
+
+    if (hits.length) {
+      rows.push('<div class="cmd-sep"></div><div class="cmd-section-label">Items</div>');
+      hits.forEach(item => {
+        const idx = CMD.push(() => {
+          closeCmd();
+          if (item.date) {
+            S.sel = S.pivot = parseDs(item.date);
+            setCalMode('month'); switchView('cal'); renderCal(); openDayPanel();
+          }
+        }) - 1;
+        rows.push(`<div class="cmd-row" data-cmd="${idx}">
+          <div class="cmd-type-badge ${item.type}">${item.type[0].toUpperCase()}</div>
+          <div class="cmd-item-text">
+            <span class="cmd-item-content">${esc(item.content.slice(0, 65))}</span>
+            <span class="cmd-item-meta">${item.date ? fmtShort(item.date) : 'No date'} · ${item.type}${item.time ? ' · ' + fmtTime(item.time) : ''}</span>
+          </div>
+        </div>`);
+      });
+    } else if (!actions.length) {
+      rows.push(`<div class="cmd-empty">No results for "<strong>${esc(query)}</strong>"</div>`);
+    }
+  }
+
+  const res = $('cmd-results');
+  res.innerHTML = rows.join('');
+
+  // Auto-focus first row
+  const first = res.querySelector('[data-cmd]');
+  if (first) first.classList.add('focused');
+};
+
+// Click delegation for cmd results
+document.addEventListener('click', e => {
+  const row = e.target.closest('#cmd-results [data-cmd]');
+  if (!row) return;
+  const fn = CMD[parseInt(row.dataset.cmd)];
+  if (fn) { closeCmd(); fn(); }
+});
+
+// Input handler
+document.addEventListener('input', e => {
+  if (e.target.id === 'cmd-input') renderCmd(e.target.value);
+});
+
+// Keyboard navigation inside palette
+document.addEventListener('keydown', e => {
+  const pal = $('cmd-palette');
+  if (!pal || pal.style.display === 'none') return;
+  if (e.key === 'Escape') { closeCmd(); return; }
+  if (e.key === 'Enter') {
+    const focused = pal.querySelector('.cmd-row.focused');
+    if (focused) focused.click();
+    return;
+  }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const rows = Array.from(pal.querySelectorAll('[data-cmd]'));
+    const cur  = pal.querySelector('.cmd-row.focused');
+    const idx  = cur ? rows.indexOf(cur) : -1;
+    const next = e.key === 'ArrowDown' ? rows[idx + 1] || rows[0] : rows[idx - 1] || rows[rows.length - 1];
+    if (cur)  cur.classList.remove('focused');
+    if (next) { next.classList.add('focused'); next.scrollIntoView({ block: 'nearest' }); }
+  }
+}, true);  // capture phase so this fires before other keydown handlers
+
 // Global keyboard shortcuts
 document.addEventListener('keydown', e => {
+  // ⌘K / Ctrl+K → command palette
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmd(); return; }
+  // Don't intercept when palette is open or focus is in an input
+  const palOpen = $('cmd-palette') && $('cmd-palette').style.display !== 'none';
+  if (palOpen) return;
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
   if (e.key === 'n' || e.key === 'N') { e.preventDefault(); openModal(); }
+  if (e.key === '/') { e.preventDefault(); openCmd(); }  // '/' also opens palette (vim-style)
   if (e.key === 'Escape') { closeModal(); closeCtx(); closeSettings(); }
 });
+
+// Init auto-bullet on textarea (static element, attach once)
+initAutoBullet();
 </script>
 </body>
 </html>
