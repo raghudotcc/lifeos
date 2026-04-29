@@ -89,7 +89,7 @@ body {
 
 /* ── APP ─────────────────────────────────────────────────────────────────── */
 #app { display: none; height: 100dvh; flex-direction: column; overflow: hidden; }
-#app.on { display: flex; }
+#app.on { display: flex; isolation: isolate; } /* contain GPU compositing layers inside app */
 
 /* ── HEADER — VS Code title bar style ───────────────────────────────────── */
 .hdr { height: var(--hdr-h); flex-shrink: 0; background: var(--bg1); border-bottom: 1px solid var(--bd); display: flex; align-items: center; padding: 0 max(14px, env(safe-area-inset-left)) 0 max(14px, env(safe-area-inset-right)); gap: 8px; z-index: 20; padding-top: env(safe-area-inset-top); height: calc(var(--hdr-h) + env(safe-area-inset-top)); }
@@ -318,7 +318,7 @@ body {
 .nb-add svg   { width: 20px; height: 20px; stroke-width: 2.5; }
 
 /* ── MODAL ───────────────────────────────────────────────────────────────── */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 100; align-items: flex-end; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 9999; align-items: flex-end; transform: translateZ(0); -webkit-transform: translateZ(0); }
 .overlay.open { display: flex; animation: fadein .12s; }
 @media (min-width: 768px) { .overlay { align-items: center; justify-content: center; } }
 @keyframes fadein { from{opacity:0}to{opacity:1} }
@@ -381,9 +381,9 @@ body {
 .ci-sep { height: 1px; background: var(--bd-lo); }
 
 /* ── SETTINGS PANEL ──────────────────────────────────────────────────────── */
-.set-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 300; }
+.set-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 10000; }
 .set-overlay.open { display: block; animation: fadein .12s; }
-.set-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg1); border-top: 1px solid var(--bd); z-index: 301; padding: 8px 0 calc(18px + var(--safe-b)); max-height: 80dvh; overflow-y: auto; transform: translateY(105%); transition: transform .26s cubic-bezier(.4,0,.2,1); }
+.set-sheet { z-index: 10001 !important; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg1); border-top: 1px solid var(--bd); z-index: 301; padding: 8px 0 calc(18px + var(--safe-b)); max-height: 80dvh; overflow-y: auto; transform: translateY(105%); transition: transform .26s cubic-bezier(.4,0,.2,1); }
 .set-sheet.open { transform: translateY(0); }
 @media (min-width: 768px) { .set-sheet { left: auto; right: 0; top: 0; bottom: 0; width: 260px; max-height: 100dvh; border-top: none; border-left: 1px solid var(--bd); transform: translateX(110%); } .set-sheet.open { transform: translateX(0); } }
 .set-drag    { width: 28px; height: 2px; background: var(--bd); margin: 0 auto 12px; }
@@ -917,8 +917,21 @@ const writeQ = fn => {
   return next;
 };
 
-const appendItem = item => writeQ(() =>
-  sheetsPost(`${rangeUrl('A:K')}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, { values: [toRow(item)] }));
+// Use appendCells (batchUpdate) instead of values.append — appendCells bypasses
+// Sheets' table-boundary detection which misreads multi-line cell content and causes
+// the next row to start at the wrong column (the "column drift" bug).
+const appendItem = item => writeQ(async () => {
+  if (!S.tabId) {
+    const meta = await sheetsGet(`/${S.sheetId}?fields=sheets.properties`);
+    S.tabId = (meta.sheets.find(s => s.properties.title === TAB) || meta.sheets[0]).properties.sheetId;
+  }
+  const row = toRow(item);
+  return sheetsPost(`/${S.sheetId}:batchUpdate`, { requests: [{ appendCells: {
+    sheetId: S.tabId,
+    rows: [{ values: row.map(v => ({ userEnteredValue: { stringValue: String(v ?? '') } })) }],
+    fields: 'userEnteredValue',
+  }}]});
+});
 
 const updateItem = item => writeQ(() =>
   sheetsPut(`${rangeUrl(`A${item._row}:K${item._row}`)}?valueInputOption=RAW`, { values: [toRow(item)] }));
