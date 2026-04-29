@@ -980,24 +980,41 @@ const writeQ = fn => {
   return next;
 };
 
-// Use appendCells (batchUpdate) instead of values.append — appendCells bypasses
-// Sheets' table-boundary detection which misreads multi-line cell content and causes
-// the next row to start at the wrong column (the "column drift" bug).
+// Stop asking Google to figure out where to write — tell it exactly which cell.
+// appendCells scans the sheet to find the "last row with data" and that scan breaks
+// when a row has a very long value (5KB base64 thumbnail) in column K: it miscounts
+// and starts the next row at column J instead of A.
+//
+// updateCells with explicit rowIndex + columnIndex = 0 has zero ambiguity:
+// "write to row N, start at column A" — no scanning, no boundary detection.
+const cellValues = row =>
+  row.map(v => ({ userEnteredValue: { stringValue: String(v ?? '') } }));
+
 const appendItem = item => writeQ(async () => {
   if (!S.tabId) {
     const meta = await sheetsGet(`/${S.sheetId}?fields=sheets.properties`);
     S.tabId = (meta.sheets.find(s => s.properties.title === TAB) || meta.sheets[0]).properties.sheetId;
   }
-  const row = toRow(item);
-  return sheetsPost(`/${S.sheetId}:batchUpdate`, { requests: [{ appendCells: {
-    sheetId: S.tabId,
-    rows: [{ values: row.map(v => ({ userEnteredValue: { stringValue: String(v ?? '') } })) }],
+  // Calculate the exact row from local state — max _row of saved items + 1.
+  // The optimistically-added item has _row:null so it's correctly ignored here.
+  const maxRow  = S.items.reduce((m, i) => Math.max(m, i._row || 0), 1);
+  const nextRow = maxRow + 1;          // 1-based row number
+  const rowIdx  = nextRow - 1;        // 0-based row index for the API
+
+  await sheetsPost(`/${S.sheetId}:batchUpdate`, { requests: [{ updateCells: {
+    start: { sheetId: S.tabId, rowIndex: rowIdx, columnIndex: 0 },
+    rows:  [{ values: cellValues(toRow(item)) }],
     fields: 'userEnteredValue',
   }}]});
+  item._row = nextRow;  // record where it actually landed
 });
 
 const updateItem = item => writeQ(() =>
-  sheetsPut(`${rangeUrl(`A${item._row}:K${item._row}`)}?valueInputOption=RAW`, { values: [toRow(item)] }));
+  sheetsPost(`/${S.sheetId}:batchUpdate`, { requests: [{ updateCells: {
+    start: { sheetId: S.tabId, rowIndex: item._row - 1, columnIndex: 0 },
+    rows:  [{ values: cellValues(toRow(item)) }],
+    fields: 'userEnteredValue',
+  }}]}));
 
 // Actually delete the row (not a soft-delete flag)
 const deleteItemRow = item => writeQ(() =>
