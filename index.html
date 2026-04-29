@@ -181,7 +181,7 @@ body {
 .dp-hdr    { display: flex; align-items: center; padding: 5px 12px 6px; gap: 8px; flex-shrink: 0; border-bottom: 1px solid var(--bd-lo); }
 .dp-date   { font-size: 11px; font-weight: 700; flex: 1; color: var(--acc); text-transform: uppercase; letter-spacing: .6px; }
 .dp-close  { width: 20px; height: 20px; border: 1px solid var(--bd); background: transparent; color: var(--t2); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.dp-items  { flex: 1; overflow-y: auto; }
+.dp-items  { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
 /* ── WEEK TIME-GRID ──────────────────────────────────────────────────────── */
 .week-view   { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -614,8 +614,15 @@ body {
 .cmd-empty { padding: 20px 14px; font-size: 13px; color: var(--t3); text-align: center; }
 
 /* ── DAY PANEL SCROLL ──────────────────────────────────────────────── */
-.dp-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.dp-items { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 
+
+/* When the modal is open, demote the day-panel from its GPU compositing layer
+   so it no longer floats above the position:fixed overlay on iOS Safari. */
+.day-panel.modal-open {
+  will-change: auto !important;   /* removes the GPU layer */
+  z-index: 0 !important;          /* back to normal document flow */
+}
 </style>
 </head>
 <body>
@@ -1754,11 +1761,13 @@ const openModal = (editId = null, preDate = null, preTime = null) => {
   // Restore attachment state
   ATT.current = item?.attachment ?? null;
   renderAttPrev();
+  // Demote day-panel GPU layer so it doesn't float above the modal on iOS
+  $('day-panel')?.classList.add('modal-open');
   $('modal').classList.add('open');
   setTimeout(() => $('m-content').focus(), 60);
 };
 
-const closeModal = () => { $('modal').classList.remove('open'); S.editId = null; S._remOn = false; ATT.stopRec(); ATT.current = null; renderAttPrev(); };
+const closeModal = () => { $('modal').classList.remove('open'); $('day-panel')?.classList.remove('modal-open'); S.editId = null; S._remOn = false; ATT.stopRec(); ATT.current = null; renderAttPrev(); };
 
 const selType = t => {
   S.modalType = t;
