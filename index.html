@@ -529,6 +529,43 @@ body {
 .day-mini.done  { opacity: .4; text-decoration: line-through; }
 .day-dots { margin-top: 2px; }
 @media (min-width: 768px) { .day-mini { display: none; } }
+
+/* ── FILE ATTACHMENTS ───────────────────────────────────────────────── */
+.att-file-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border: 1px solid var(--bd2);
+  background: var(--bg2); color: var(--t1); font-size: 12px;
+}
+.att-file-name { font-weight: 600; }
+.att-file-size { color: var(--t3); font-family: monospace; font-size: 11px; }
+.item-file {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 8px; margin-top: 4px; border: 1px solid var(--bd);
+  background: var(--bg2); color: var(--t1); font-size: 11px; cursor: pointer;
+  text-decoration: none; transition: all .12s;
+}
+.item-file:hover { border-color: var(--acc); color: var(--acc); }
+.item-file-size { color: var(--t3); font-family: monospace; font-size: 10px; margin-left: 2px; }
+
+/* ── REMINDER BANNER (in-app fallback for notifications) ─────────────── */
+.reminder-banner {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 12px) + 8px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--acc); color: #000;
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  font-size: 14px; font-weight: 600; z-index: 500;
+  border: 1px solid #000; box-shadow: 0 8px 24px rgba(0,0,0,.6);
+  max-width: calc(100vw - 24px); min-width: 240px;
+  animation: rb-in .35s cubic-bezier(.34, 1.56, .64, 1);
+  cursor: pointer;
+}
+.rb-icon { font-size: 18px; flex-shrink: 0; }
+.rb-body { flex: 1; line-height: 1.35; }
+.rb-close { background: transparent; border: none; color: #000; font-size: 16px; font-weight: 700; cursor: pointer; padding: 0 4px; opacity: .7; }
+.rb-close:hover { opacity: 1; }
+@keyframes rb-in { from { transform: translateX(-50%) translateY(-120%); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+.reminder-banner + .reminder-banner { top: calc(env(safe-area-inset-top, 12px) + 70px); }
 </style>
 </head>
 <body>
@@ -636,14 +673,18 @@ body {
     <div class="m-handle-wrap"><div class="m-handle"></div></div>
     <div class="m-title" id="m-title">New Item</div>
     <textarea class="m-ta" id="m-content" placeholder="What's on your mind?" rows="4"></textarea>
-    <!-- Attachment bar -->
+    <!-- Attachment bar — Camera | Gallery | Voice | File -->
     <div class="m-attach-bar">
-      <button class="att-btn" id="att-img-btn"  onclick="pickImage()"       title="Attach photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+      <button class="att-btn" id="att-cam-btn"  onclick="pickCamera()"      title="Take photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+      <button class="att-btn" id="att-gal-btn"  onclick="pickGallery()"     title="Photo from gallery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
       <button class="att-btn" id="att-mic-btn"  onclick="toggleRecording()" title="Record voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg></button>
+      <button class="att-btn" id="att-file-btn" onclick="pickFile()"        title="Attach file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
       <span class="att-status" id="att-status"></span>
     </div>
     <div class="m-att-preview" id="m-att-preview" style="display:none"></div>
-    <input type="file" id="img-picker" accept="image/*" capture="environment" style="display:none" onchange="handleImagePick(this)">
+    <input type="file" id="cam-picker"  accept="image/*" capture="environment" style="display:none" onchange="handleImagePick(this)">
+    <input type="file" id="gal-picker"  accept="image/*"                       style="display:none" onchange="handleImagePick(this)">
+    <input type="file" id="file-picker" accept=".pdf,.doc,.docx,.txt,.md,.csv,.json,.xlsx,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,text/csv,application/json" style="display:none" onchange="handleFilePick(this)">
     <div class="type-sel">
       <button class="topt on note" data-t="note"  onclick="selType('note')"><span class="topt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>Note</button>
       <button class="topt todo"    data-t="todo"  onclick="selType('todo')"><span class="topt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Todo</button>
@@ -835,21 +876,30 @@ const sheetsPut  = (p,b) => req('PUT',  `${BASE}${p}`, b);
 const rangeUrl   = r  => `/${S.sheetId}/values/${TAB}!${r}`;
 const batchUpd   = rs => sheetsPost(`/${S.sheetId}:batchUpdate`, { requests: rs });
 
-// Columns: id | type | content | date | time | completed | created_at | deleted | end_time | reminders
-const toRow   = i => [
+// Columns: id | type | content | date | time | completed | created_at | deleted | end_time | reminders | attachment
+// JSON fields are URL-encoded so they contain no commas/quotes/braces — eliminates any
+// chance of Sheets mis-detecting cell boundaries on values like {"start":30,"every":10}.
+const encField = v => v ? encodeURIComponent(JSON.stringify(v)) : '';
+const decField = s => {
+  if (!s) return null;
+  // Try URL-decoded JSON first (new format), fall back to raw JSON (legacy rows)
+  try { return JSON.parse(decodeURIComponent(s)); } catch(_) {}
+  try { return JSON.parse(s); } catch(_) { return null; }
+};
+
+const toRow = i => [
   i.id, i.type, i.content, i.date||'', i.time||'', bool(i.completed),
   i.createdAt, bool(i.deleted), i.endTime||'',
-  i.reminders   ? JSON.stringify(i.reminders)   : '',
-  i.attachment  ? JSON.stringify(i.attachment)  : '',
+  encField(i.reminders),
+  encField(i.attachment),
 ];
-const safeJSON = s => { try { return s ? JSON.parse(s) : null; } catch(_) { return null; } };
 const fromRow = (row, idx) => ({
   id: row[0]||'', type: row[1]||'note', content: row[2]||'',
   date: row[3]||'', time: row[4]||'', completed: row[5]==='TRUE',
   createdAt: row[6]||'', deleted: row[7]==='TRUE',
   endTime:    row[8]||'',
-  reminders:  safeJSON(row[9]),
-  attachment: safeJSON(row[10]),
+  reminders:  decField(row[9]),
+  attachment: decField(row[10]),
   _row: idx + 2,
 });
 
@@ -857,15 +907,25 @@ const fetchItems = () =>
   sheetsGet(`${rangeUrl('A2:K3000')}`)
     .then(d => { S.items = (d.values||[]).map(fromRow).filter(i => i.id && !i.deleted); });
 
-const appendItem = item =>
-  sheetsPost(`${rangeUrl('A:K')}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, { values: [toRow(item)] });
+// Write queue — serialize all sheet writes so two appends never race against each other.
+// This was the source of the "row drift" bug: when a slow append (with reminder JSON) was
+// in flight, a quick second add would race and Sheets' table-boundary detection got confused.
+let _wq = Promise.resolve();
+const writeQ = fn => {
+  const next = _wq.catch(() => {}).then(fn);
+  _wq = next.catch(() => {});  // queue keeps moving even if a write fails
+  return next;
+};
 
-const updateItem = item =>
-  sheetsPut(`${rangeUrl(`A${item._row}:K${item._row}`)}?valueInputOption=RAW`, { values: [toRow(item)] });
+const appendItem = item => writeQ(() =>
+  sheetsPost(`${rangeUrl('A:K')}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, { values: [toRow(item)] }));
+
+const updateItem = item => writeQ(() =>
+  sheetsPut(`${rangeUrl(`A${item._row}:K${item._row}`)}?valueInputOption=RAW`, { values: [toRow(item)] }));
 
 // Actually delete the row (not a soft-delete flag)
-const deleteItemRow = item =>
-  batchUpd([{ deleteDimension: { range: { sheetId: S.tabId, dimension: 'ROWS', startIndex: item._row-1, endIndex: item._row } } }]);
+const deleteItemRow = item => writeQ(() =>
+  batchUpd([{ deleteDimension: { range: { sheetId: S.tabId, dimension: 'ROWS', startIndex: item._row-1, endIndex: item._row } } }]));
 
 // ══════════════════════════════════════════════════════════════════
 // AUTH
@@ -959,14 +1019,16 @@ const driveSearch = name =>
   fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`)}&fields=files(id,modifiedTime)&orderBy=modifiedTime+desc&pageSize=5`, { headers: authH() })
     .then(r => r.json());
 
+const HEADER = ['id','type','content','date','time','completed','created_at','deleted','end_time','reminders','attachment'];
 const ensureItemsTab = async () => {
   const meta = await sheetsGet(`/${S.sheetId}?fields=sheets.properties`);
-  S.tabId = (meta.sheets.find(s => s.properties.title === TAB) || meta.sheets[0]).properties.sheetId;
-  if (!meta.sheets.find(s => s.properties.title === TAB)) {
+  const tab  = meta.sheets.find(s => s.properties.title === TAB);
+  S.tabId = (tab || meta.sheets[0]).properties.sheetId;
+  if (!tab) {
     await sheetsPost(`/${S.sheetId}:batchUpdate`, { requests: [{ addSheet: { properties: { title: TAB } } }] });
-    await sheetsPut(`${rangeUrl('A1:J1')}?valueInputOption=RAW`,
-      { values: [['id','type','content','date','time','completed','created_at','deleted','end_time','reminders','attachment']] });
   }
+  // Always rewrite the header row to keep schema in sync — fixes mis-aligned columns from old sheets
+  await sheetsPut(`${rangeUrl('A1:K1')}?valueInputOption=RAW`, { values: [HEADER] });
 };
 
 const findOrCreateSheet = async () => {
@@ -993,27 +1055,45 @@ const findOrCreateSheet = async () => {
   showLoad('Creating your LifeOS sheet…');
   const ss = await sheetsPost('', { properties: { title: 'LifeOS' }, sheets: [{ properties: { title: TAB } }] });
   S.sheetId = ss.spreadsheetId; persist();
-  await sheetsPut(`${rangeUrl('A1:J1')}?valueInputOption=RAW`,
-    { values: [['id','type','content','date','time','completed','created_at','deleted','end_time','reminders']] });
+  await sheetsPut(`${rangeUrl('A1:K1')}?valueInputOption=RAW`, { values: [HEADER] });
   await ensureItemsTab();
 };
 
 // ══════════════════════════════════════════════════════════════════
 // NOTIFICATIONS — local scheduling via Notification API
 // ══════════════════════════════════════════════════════════════════
-// Notify: SW showNotification when installed (works backgrounded), else direct Notification
+// Notify: system notification + haptic vibration + in-app banner.
+// Triple-pronged so the reminder is impossible to miss.
 const notify = (body, tag) => {
+  // 1. Haptic vibration (Android, some browsers)
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+  // 2. In-app banner — always shows, even if notifications blocked
+  showReminderBanner(body);
+  // 3. System notification (if granted)
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const opts = { body, icon: 'icon.svg', tag };
-  // SW controller means the PWA is installed — prefer reg.showNotification
+  const opts = {
+    body, icon: 'icon.svg', tag, badge: 'icon.svg',
+    vibrate: [200, 100, 200, 100, 400],
+    requireInteraction: true,
+    renotify: true,
+  };
   if (navigator.serviceWorker?.controller) {
     navigator.serviceWorker.ready
-      .then(r => r.showNotification('LifeOS', { ...opts, requireInteraction: true }))
-      .catch(() => new Notification('LifeOS', opts)); // immediate fallback
+      .then(r => r.showNotification('LifeOS Reminder', opts))
+      .catch(() => { try { new Notification('LifeOS Reminder', opts); } catch(_) {} });
   } else {
-    // Plain browser tab — direct Notification works fine
-    try { new Notification('LifeOS', opts); } catch(e) { console.warn('Notification failed:', e); }
+    try { new Notification('LifeOS Reminder', opts); } catch(_) {}
   }
+};
+
+const showReminderBanner = body => {
+  // Stack new banners; auto-dismiss after 12s; tap to close
+  const banner = document.createElement('div');
+  banner.className = 'reminder-banner';
+  banner.innerHTML = `<span class="rb-icon">⏰</span><span class="rb-body">${esc(body)}</span><button class="rb-close" aria-label="Dismiss">✕</button>`;
+  banner.onclick = () => banner.remove();
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 12000);
 };
 
 // Test button: fires a notification immediately so user can verify permission works
@@ -1113,8 +1193,17 @@ const addItem = async ({ content, type, date='', time='', endTime='', reminders=
   if (!await ensureToken()) return;
   const item = { id: uid(), type, content, date, time, endTime, reminders, attachment, completed: false, createdAt: new Date().toISOString(), deleted: false, _row: null };
   S.items.unshift(item); cache(); render();
-  try { await appendItem(item); await fetchItems(); cache(); render(); scheduleReminders(); toast('Saved'); }
-  catch(e) { S.items = S.items.filter(i => i.id !== item.id); cache(); render(); toast('Save failed: ' + e.message); }
+  try {
+    await appendItem(item);
+    toast('Saved');
+    // Append succeeded — item is in the sheet. Try to refresh row indices but don't roll back if this part fails.
+    try { await fetchItems(); cache(); render(); scheduleReminders(); }
+    catch(e) { console.warn('Post-save refresh failed (item is saved, will sync next time):', e); }
+  } catch(e) {
+    // Only roll back if the actual save failed
+    S.items = S.items.filter(i => i.id !== item.id); cache(); render();
+    toast('Save failed: ' + e.message);
+  }
 };
 
 const editItem = async (id, patch) => {
@@ -1146,8 +1235,12 @@ const deleteItem = async id => {
   if (!await ensureToken()) return;
   const item = S.items.find(i => i.id === id); if (!item) return;
   S.items = S.items.filter(i => i.id !== id); cache(); render();
-  try { await deleteItemRow(item); toast('Deleted'); }
-  catch(e) { toast('Delete failed — sync to recover'); }
+  try {
+    await deleteItemRow(item);
+    toast('Deleted');
+    // Row indices for everything below the deleted row shifted up — refetch to stay in sync
+    try { await fetchItems(); cache(); render(); } catch(_) {}
+  } catch(e) { toast('Delete failed — sync to recover'); }
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -1209,6 +1302,7 @@ const itemHTML = item => {
         <span class="badge ${item.type}" data-badge="${item.id}">${item.type}</span>
       </div>
       ${att?.type==='audio' ? `<button class="item-play" data-audio="${att.id}" data-dur="${att.dur||0}" onclick="playAudio(this)">▶ ${fmtDur(att.dur||0)}</button>` : ''}
+      ${att?.type==='file'  ? `<a class="item-file" href="https://drive.google.com/file/d/${att.id}/view" target="_blank" rel="noopener" onclick="event.stopPropagation()">📎 ${esc(att.name)} <span class="item-file-size">${fmtSize(att.size||0)}</span></a>` : ''}
     </div>
   </div>`;
 };
@@ -1762,8 +1856,9 @@ const ATT = (() => {
   let current  = null;  // {type:'image',data:'...'} | {type:'audio',id:'...',dur:N} | null
   let mediaRec = null, chunks = [], timer = null, secs = 0;
 
-  // ── Image ─────────────────────────────────────────────────────────
-  const pickImage = () => $('img-picker').click();
+  // ── Image: Camera and Gallery ─────────────────────────────────────
+  const pickCamera  = () => $('cam-picker').click();
+  const pickGallery = () => $('gal-picker').click();
 
   const handleImagePick = async input => {
     const file = input.files[0]; if (!file) return;
@@ -1777,6 +1872,22 @@ const ATT = (() => {
       current = { type: 'image', id, thumb };
       renderAttPrev();
     } catch(e) { toast('Image error: ' + e.message); setStatus(''); }
+  };
+
+  // ── File attachment ────────────────────────────────────────────────
+  const pickFile = () => $('file-picker').click();
+
+  const handleFilePick = async input => {
+    const file = input.files[0]; if (!file) return;
+    input.value = '';
+    if (file.size > 25 * 1024 * 1024) return toast('File too large (max 25MB)');
+    setStatus('Uploading ' + file.name + '…');
+    try {
+      if (!await ensureToken()) { setStatus(''); return; }
+      const id = await uploadDrive(file, file.name, file.type || 'application/octet-stream');
+      current = { type: 'file', id, name: file.name, mime: file.type, size: file.size };
+      renderAttPrev();
+    } catch(e) { toast('File upload failed: ' + e.message); setStatus(''); }
   };
 
   // Returns {full: Blob for Drive, thumb: base64 tiny for Sheets}
@@ -1873,9 +1984,17 @@ const ATT = (() => {
         <img class="att-img" src="${current.thumb}" onclick="showLightbox('${current.id}')">
         <button class="att-del" onclick="ATT.clear()" title="Remove">✕</button>
       </div>`;
-    } else {
+    } else if (current.type === 'audio') {
       el.innerHTML = `<div class="att-audio-chip">
-        🎤 &nbsp;<span style="font-family:monospace">${fmtDur(current.dur)}</span>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+        <span style="font-family:monospace">${fmtDur(current.dur)}</span>
+        <button class="att-inline-del" onclick="ATT.clear()">✕</button>
+      </div>`;
+    } else if (current.type === 'file') {
+      el.innerHTML = `<div class="att-file-chip">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="att-file-name">${esc(current.name)}</span>
+        <span class="att-file-size">${fmtSize(current.size)}</span>
         <button class="att-inline-del" onclick="ATT.clear()">✕</button>
       </div>`;
     }
@@ -1886,15 +2005,19 @@ const ATT = (() => {
   const getCurrent = () => current;
   const setCurrent = v => { current = v; };
 
-  return { pickImage, handleImagePick, toggleRec, stopRec, clear, getCurrent, setCurrent,
+  return { pickCamera, pickGallery, pickFile, handleImagePick, handleFilePick, toggleRec, stopRec, clear, getCurrent, setCurrent,
            renderAttPrev: renderAttPrev, get current() { return current; }, set current(v) { current = v; } };
 })();
 
 // Expose top-level for onclick attributes
-const pickImage      = () => ATT.pickImage();
+const pickCamera     = () => ATT.pickCamera();
+const pickGallery    = () => ATT.pickGallery();
+const pickFile       = () => ATT.pickFile();
 const handleImagePick= el  => ATT.handleImagePick(el);
+const handleFilePick = el  => ATT.handleFilePick(el);
 const toggleRecording= ()  => ATT.toggleRec();
 const renderAttPrev  = ()  => ATT.renderAttPrev();
+const fmtSize = n => n < 1024 ? n + ' B' : n < 1048576 ? (n/1024).toFixed(0) + ' KB' : (n/1048576).toFixed(1) + ' MB';
 
 // ── Lightbox ───────────────────────────────────────────────────────────────
 const showLightbox = async driveId => {
