@@ -902,18 +902,47 @@ const silentRefresh = () => new Promise(ok => {
 
 // Auto-login for RETURNING users only (sheetId stored = prior auth evidence)
 // Uses a separate client from startAuth so they never interfere
+// Silent auto-login. If cached app is visible, do it invisibly in background.
+// iOS standalone PWAs often hang silent token requests — timeout after 5s.
 const autoLogin = () => {
-  showLoad('Signing in…');
-  google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPE,
-    callback: async r => {
-      if (r.error) { hideLoad(); return; } // silent fail → auth screen stays visible
-      S.token = r.access_token;
-      S.tokenExp = Date.now() + r.expires_in * 1000 - 60000;
-      await boot();
-    },
-  }).requestAccessToken({ prompt: '' });
+  const appVisible = $('app').classList.contains('on');
+  if (!appVisible) showLoad('Signing in…');
+
+  let resolved = false;
+  const finish = () => {
+    if (resolved) return; resolved = true;
+    if (!appVisible) hideLoad();
+  };
+  // iOS PWA hang protection — give up if no callback in 5s
+  const timer = setTimeout(finish, 5000);
+
+  // Quietly refresh data without blocking UI when cached app is showing
+  const softRefresh = async () => {
+    try {
+      if (!S.tabId) {
+        const meta = await sheetsGet(`/${S.sheetId}?fields=sheets.properties`);
+        S.tabId = (meta.sheets.find(s => s.properties.title === TAB) || meta.sheets[0]).properties.sheetId;
+      }
+      await fetchItems(); cache(); render();
+      fetchUserInfo(); scheduleReminders();
+    } catch(e) { console.warn('Background refresh failed:', e); }
+  };
+
+  try {
+    google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID, scope: SCOPE,
+      callback: async r => {
+        clearTimeout(timer);
+        if (r.error) { finish(); return; }
+        S.token = r.access_token;
+        S.tokenExp = Date.now() + r.expires_in * 1000 - 60000;
+        finish();
+        // If app already visible (cached), refresh quietly. Otherwise full boot.
+        if (appVisible) softRefresh();
+        else await boot();
+      },
+    }).requestAccessToken({ prompt: '' });
+  } catch(e) { clearTimeout(timer); finish(); }
 };
 
 // Poll until GIS library is ready, then run cb

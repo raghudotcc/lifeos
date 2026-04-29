@@ -1,4 +1,4 @@
-const V = 'lifeos-v9';
+const V = 'lifeos-v10';
 const SHELL = ['index.html', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install',  e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL))); self.skipWaiting(); });
