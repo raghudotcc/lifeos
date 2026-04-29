@@ -472,6 +472,63 @@ body {
   .ci { padding: 11px 14px; font-size: 14px; }
   .set-item { padding: 12px 10px; font-size: 14px; }
 }
+
+/* ── COMBINED CAL TOOLBAR ─────────────────────────────────────────────── */
+.cal-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px; flex-shrink: 0;
+  background: var(--bg1); border-bottom: 1px solid var(--bd);
+}
+.cal-toolbar .seg-ctrl {
+  display: flex; background: var(--bg2); border: 1px solid var(--bd-lo); flex-shrink: 0;
+}
+.cal-toolbar .seg {
+  padding: 5px 11px; border: none; border-bottom: 2px solid transparent;
+  background: transparent; font-size: 12px; font-weight: 500; color: var(--t2);
+  cursor: pointer; border-right: 1px solid var(--bd-lo); transition: all .12s;
+}
+.cal-toolbar .seg:last-child { border-right: none; }
+.cal-toolbar .seg:hover { color: var(--t1); background: var(--bg3); }
+.cal-toolbar .seg.on { color: var(--acc); border-bottom-color: var(--acc); background: var(--bg); font-weight: 600; }
+.cal-label { flex: 1; font-size: 14px; font-weight: 700; color: var(--t1); min-width: 0; text-align: center; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-toolbar-end { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .cal-toolbar { gap: 7px; padding: 7px 10px; }
+  .cal-toolbar .seg { padding: 5px 9px; font-size: 11px; }
+  .cal-label { font-size: 13px; }
+}
+@media (min-width: 768px) {
+  .cal-label { font-size: 16px; }
+  .cal-toolbar .seg { padding: 6px 14px; font-size: 13px; }
+  .cal-toolbar { padding: 9px 14px; }
+}
+
+/* ── SWIPE GESTURES ───────────────────────────────────────────────────── */
+.item-row { position: relative; background: var(--bg); transition: transform .22s cubic-bezier(.4,0,.2,1); will-change: transform; z-index: 1; }
+.item-row.swiping { z-index: 2; }
+.item-row::before, .item-row::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 100vw;
+  display: flex; align-items: center; padding: 0 18px;
+  font-size: 16px; font-weight: 700; color: white; opacity: 0;
+  transition: opacity .15s; pointer-events: none; z-index: -1;
+}
+.item-row::before { left: -100vw; background: var(--done); justify-content: flex-end; content: '✓ Done'; padding-right: 22px; }
+.item-row::after  { right: -100vw; background: var(--red);  justify-content: flex-start; content: 'Delete ✕'; padding-left: 22px; }
+.item-row.swipe-right::before { opacity: 1; }
+.item-row.swipe-left::after   { opacity: 1; }
+
+/* ── MOBILE: day-cell first event title ───────────────────────────────── */
+.day-mini {
+  font-size: 9px; line-height: 1.25; padding: 1px 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border-left: 2px solid; flex-shrink: 0; margin-top: 2px;
+}
+.day-mini.note  { background: var(--note-bg);  color: var(--note);  border-left-color: var(--note); }
+.day-mini.todo  { background: var(--todo-bg);  color: var(--todo);  border-left-color: var(--todo); }
+.day-mini.event { background: var(--event-bg); color: var(--event); border-left-color: var(--event); }
+.day-mini.done  { opacity: .4; text-decoration: line-through; }
+.day-dots { margin-top: 2px; }
+@media (min-width: 768px) { .day-mini { display: none; } }
 </style>
 </head>
 <body>
@@ -515,11 +572,18 @@ body {
   <div class="body">
     <!-- CALENDAR VIEW -->
     <div class="view on" id="v-cal">
-      <div class="seg-wrap">
+      <!-- Combined toolbar: view picker + date + today + arrows in one row -->
+      <div class="cal-toolbar">
         <div class="seg-ctrl">
           <button class="seg on" data-m="month" onclick="setCalMode('month')">Month</button>
           <button class="seg"    data-m="week"  onclick="setCalMode('week')">Week</button>
           <button class="seg"    data-m="day"   onclick="setCalMode('day')">Day</button>
+        </div>
+        <span class="cal-label" id="cal-label">—</span>
+        <div class="cal-toolbar-end">
+          <button class="today-pill" onclick="goToday()">Today</button>
+          <button class="nav-arrow" onclick="nav(-1)" aria-label="Previous">‹</button>
+          <button class="nav-arrow" onclick="nav(1)"  aria-label="Next">›</button>
         </div>
       </div>
       <!-- calendar content injected here -->
@@ -1147,28 +1211,23 @@ const monthHTML = () => {
     else                      { day=i-first-total+1; mo=m+1; yr=y; other=true; if(mo>11){mo=0;yr++;} }
     const d = new Date(yr,mo,day), dstr = ds(d);
     const its = onDate(d);
-    const dots  = its.slice(0,3).map(i => `<span class="dot ${i.completed?'done':i.type}"></span>`).join('');
+    // Mobile: show first event title + dots for the rest. Desktop: full chips.
+    const firstChip = its[0]
+      ? `<div class="day-mini ${its[0].completed?'done':its[0].type}">${esc(its[0].content)}</div>`
+      : '';
+    const restDots  = its.slice(1, 4).map(i => `<span class="dot ${i.completed?'done':i.type}"></span>`).join('');
     const chips = its.slice(0,3).map(i => `<div class="day-chip ${i.completed?'done':i.type}">${esc(i.content)}</div>`).join('') +
                   (its.length > 3 ? `<div class="day-chip more">+${its.length-3}</div>` : '');
     return `<div class="day-cell${other?' other':''}${dstr===tds?' today':''}${dstr===sel?' sel':''}" data-day="${dstr}">
       <div class="day-n">${day}</div>
-      ${dots ? `<div class="day-dots">${dots}</div>` : ''}
+      ${firstChip}
+      ${restDots ? `<div class="day-dots">${restDots}</div>` : ''}
       ${chips}
     </div>`;
   });
 
   return `
   <div class="cal-left">
-    <div class="cal-nav">
-      <div class="cal-nav-side">
-        <button class="nav-arrow" onclick="nav(-1)">‹</button>
-      </div>
-      <span class="cal-nav-lbl">${MON[m]} ${y}</span>
-      <div class="cal-nav-side">
-        <button class="today-pill" onclick="goToday()">Today</button>
-        <button class="nav-arrow" onclick="nav(1)">›</button>
-      </div>
-    </div>
     <div class="weekday-row">${DABRV.map(d=>`<div class="wday-lbl">${d}</div>`).join('')}</div>
     <div class="month-grid" id="month-grid">${cells.join('')}</div>
   </div>
@@ -1245,14 +1304,6 @@ const weekHTML = () => {
     ? `<div class="week-now-line" id="week-now-line" style="top:${nowY}px"><div class="week-now-dot"></div></div>` : '';
 
   return `
-  <div class="cal-nav" style="flex-shrink:0">
-    <button class="nav-arrow" onclick="nav(-1)">‹</button>
-    <span class="cal-nav-lbl">${rangeLabel}</span>
-    <div class="cal-nav-side">
-      <button class="today-pill" onclick="goToday()">Today</button>
-      <button class="nav-arrow" onclick="nav(1)">›</button>
-    </div>
-  </div>
   <div class="week-view">
     <div class="week-hdr"><div class="week-gutter"></div>${hdrHTML}</div>
     <div class="week-allday"><div class="week-allday-gutter">all day</div>${alldayHTML}</div>
@@ -1320,14 +1371,6 @@ const dayHTML = () => {
     : '';
 
   return `
-  <div class="cal-nav">
-    <button class="nav-arrow" onclick="nav(-1)">‹</button>
-    <span class="cal-nav-lbl">${label}</span>
-    <div class="cal-nav-side">
-      <button class="today-pill" onclick="goToday()">Today</button>
-      <button class="nav-arrow" onclick="nav(1)">›</button>
-    </div>
-  </div>
   <div class="day-view-wrap">
     <div class="allday-bar">
       <div class="allday-lbl">All day</div>
@@ -1364,7 +1407,28 @@ const listHTML = () => {
 // ══════════════════════════════════════════════════════════════════
 // RENDER DISPATCH
 // ══════════════════════════════════════════════════════════════════
+// Update the toolbar label based on current view + pivot date
+const updateCalLabel = () => {
+  const lbl = $('cal-label'); if (!lbl) return;
+  if (S.calMode === 'month') {
+    const y = S.pivot.getFullYear(), m = S.pivot.getMonth();
+    lbl.textContent = `${MON[m]} ${y}`;
+  } else if (S.calMode === 'week') {
+    const start = wkStart(S.pivot);
+    const end   = addDay(start, 6);
+    lbl.textContent = start.getMonth() === end.getMonth()
+      ? `${MON[start.getMonth()]} ${start.getDate()}–${end.getDate()}`
+      : `${MON[start.getMonth()].slice(0,3)} ${start.getDate()} – ${MON[end.getMonth()].slice(0,3)} ${end.getDate()}`;
+  } else {
+    const d = S.sel;
+    lbl.textContent = sameDs(d, today())
+      ? 'Today'
+      : `${DAY[d.getDay()].slice(0,3)}, ${MON[d.getMonth()].slice(0,3)} ${d.getDate()}`;
+  }
+};
+
 const renderCal = () => {
+  updateCalLabel();
   const html = { month: monthHTML, week: weekHTML, day: dayHTML }[S.calMode]();
   $('cal-body').innerHTML = html;
   if (S.calMode === 'month') { initDayPanel(); initSwipe($('day-panel'), closeDayPanel); refreshDayPanel(); }
@@ -1856,6 +1920,58 @@ const playAudio = async btn => {
     audio.onended = () => { btn.textContent = `▶ ${fmtDur(dur)}`; };
   } catch(e) { btn.classList.remove('loading'); btn.textContent = `▶ ${fmtDur(dur)}`; toast('Playback failed'); }
 };
+
+
+// ── SWIPE GESTURES ON ITEMS — left = delete, right = mark done ──────────────
+(() => {
+  let target = null, startX = 0, startY = 0, dx = 0, isHoriz = null, row = null;
+
+  document.addEventListener('touchstart', e => {
+    if (e.target.closest('.item-cb,[data-toggle],.item-thumb,.item-play,.badge')) return;
+    const r = e.target.closest('.item-row[data-id]');
+    if (!r) return;
+    target = r;
+    row = r;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    dx = 0; isHoriz = null;
+    row.style.transition = 'none';
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!target) return;
+    const x = e.touches[0].clientX, y = e.touches[0].clientY;
+    const ddx = x - startX, ddy = y - startY;
+    if (isHoriz === null) {
+      if (Math.abs(ddx) < 8 && Math.abs(ddy) < 8) return;
+      isHoriz = Math.abs(ddx) > Math.abs(ddy);
+      if (!isHoriz) { target = null; row = null; return; }
+      target.classList.add('swiping');
+    }
+    dx = ddx;
+    row.style.transform = `translateX(${dx}px)`;
+    target.classList.toggle('swipe-right', dx > 30);
+    target.classList.toggle('swipe-left',  dx < -30);
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    if (!target || !row) { target = null; row = null; return; }
+    row.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
+    const id = row.dataset.id;
+    const item = S.items.find(i => i.id === id);
+    if (dx > 90 && item?.type === 'todo') {
+      toggleDone(id);
+      row.style.transform = '';
+    } else if (dx < -90) {
+      row.style.transform = `translateX(-${row.offsetWidth}px)`;
+      setTimeout(() => deleteItem(id), 200);
+    } else {
+      row.style.transform = '';
+    }
+    setTimeout(() => target?.classList.remove('swiping','swipe-right','swipe-left'), 240);
+    target = null; row = null;
+  }, { passive: true });
+})();
 
 // ══════════════════════════════════════════════════════════════════
 // EVENT WIRING — event delegation for dynamically rendered HTML
