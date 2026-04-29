@@ -165,8 +165,9 @@ body {
 /* ── MONTH VIEW LAYOUT ───────────────────────────────────────────────────── */
 @media (max-width: 767px) {
   .cal-wrap  { position: relative; flex: 1; overflow: hidden; }
-  .day-panel { position: absolute; bottom: 0; left: 0; right: 0; max-height: 60vh; border-top: 1px solid var(--bd); background: var(--bg1); box-shadow: 0 -2px 16px rgba(0,0,0,.8); transform: translateY(100%); transition: transform .26s cubic-bezier(.4,0,.2,1); will-change: transform; touch-action: none; }
-  .day-panel.open { transform: translateY(0); }
+  .day-panel { position: absolute; bottom: 0; left: 0; right: 0; max-height: 72vh; border-top: 1px solid var(--bd); background: var(--bg1); box-shadow: 0 -2px 16px rgba(0,0,0,.8); transform: translateY(100%); transition: transform .26s cubic-bezier(.4,0,.2,1); will-change: transform; touch-action: none; }
+  /* z-index:5 beats .day-cell.sel { z-index:1 } so the panel covers the selected day cell */
+  .day-panel.open { transform: translateY(0); z-index: 5; }
 }
 @media (min-width: 768px) {
   .cal-wrap  { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
@@ -181,7 +182,7 @@ body {
 .dp-hdr    { display: flex; align-items: center; padding: 5px 12px 6px; gap: 8px; flex-shrink: 0; border-bottom: 1px solid var(--bd-lo); }
 .dp-date   { font-size: 11px; font-weight: 700; flex: 1; color: var(--acc); text-transform: uppercase; letter-spacing: .6px; }
 .dp-close  { width: 20px; height: 20px; border: 1px solid var(--bd); background: transparent; color: var(--t2); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.dp-items  { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.dp-items  { flex: 1; min-height: 0; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
 
 /* ── WEEK TIME-GRID ──────────────────────────────────────────────────────── */
 .week-view   { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -614,7 +615,7 @@ body {
 .cmd-empty { padding: 20px 14px; font-size: 13px; color: var(--t3); text-align: center; }
 
 /* ── DAY PANEL SCROLL ──────────────────────────────────────────────── */
-.dp-items { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.dp-items { flex: 1; min-height: 0; overflow-y: scroll; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 
 
 /* When the modal is open, demote the day-panel from its GPU compositing layer
