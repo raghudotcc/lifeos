@@ -778,6 +778,12 @@ html.dark .ctx-menu { background: rgba(50,50,52,.95); }
 .cmd-row-body { flex: 1; min-width: 0; }
 .cmd-row-title { color: var(--t-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cmd-row-sub { color: var(--t-2); font-size: 12px; margin-top: 1px; }
+.cmd-row-tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+  vertical-align: middle; }
+.cmd-row-tag.note  { background: rgba(255,149,0,.18);  color: var(--c-note); }
+.cmd-row-tag.todo  { background: rgba(0,122,255,.18);  color: var(--c-todo); }
+.cmd-row-tag.event { background: rgba(175,82,222,.18); color: var(--c-event); }
 .cmd-empty { padding: var(--s-6) var(--s-4); text-align: center; color: var(--t-3); font-size: 14px; }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -1409,6 +1415,17 @@ const DateParser = (() => {
     const fn     = HOLIDAYS[word];
     if (fn) return fn(year);
 
+    // "apr 15" / "april 15, 1997" — explicit month/day, default current year, roll to next year if past
+    const MNAMES = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const md = lc.match(/^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:\s*,?\s*(\d{2,4}))?$/);
+    if (md) {
+      let yr = md[3] ? +md[3] : t.getFullYear();
+      if (yr < 100) yr += 2000;
+      const dt = new Date(yr, MNAMES.indexOf(md[1]), +md[2]);
+      if (!md[3] && dt < t) dt.setFullYear(yr + 1);
+      return dt;
+    }
+
     const d = new Date(s);
     if (!isNaN(d.getTime())) return d;
     return null;
@@ -1433,6 +1450,119 @@ const DateParser = (() => {
   };
 
   return { parse, describe };
+})();
+
+
+/* ─── 8b. QUICK-PARSE ──────────────────────────────────────────────────── */
+/* Parse a single line into {type, title, date, time, endTime}.
+   Returns null if no time and no date phrase found (caller falls back to search). */
+
+const QuickParse = (() => {
+  const pad = n => String(n).padStart(2, '0');
+
+  const TIME_RANGE = /\b(\d{1,2})(?::(\d{2}))?\s*(?:-|to|–)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i;
+  const TIME_12    = /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i;
+  const TIME_24    = /\b([01]?\d|2[0-3]):([0-5]\d)\b/;
+
+  const DATE_RES = [
+    /\btoday\b/i,
+    /\btom(?:orrow)?\b/i,
+    /\byest(?:erday)?\b/i,
+    /\b(?:next|this|last)\s+(?:sun|mon|tue|wed|thu|fri|sat)(?:day|nesday|sday|urday)?\b/i,
+    /\b(?:sun|mon|tue|wed|thu|fri|sat)(?:day|nesday|sday|urday)?\b/i,
+    /\b(?:in\s+)?\d+\s+(?:day|week|month|year)s?(?:\s+ago)?\b/i,
+    /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2}(?:\s*,?\s*\d{2,4})?\b/i,
+    /\b\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\b/,
+  ];
+
+  const TODO_LEAD  = /^\s*(?:remind\s+me\s+to\s+|todo:?\s+|task:?\s+|t:\s+)/i;
+  const NOTE_LEAD  = /^\s*(?:note:?\s+|n:\s+)/i;
+  const TODO_VERB  = /^(?:buy|call|email|text|finish|read|review|send|submit|pay|book|order|fix|write|check|file|schedule|renew|cancel|reply|ship|return|update|clean|wash|cook|prep)\b/i;
+  const EVENT_HINT = /\b(?:meeting|lunch|dinner|breakfast|coffee|standup|sync|interview|appointment|flight|train|class|session|workout|gym|brunch|party|wedding)\b/i;
+
+  const parseTime = s => {
+    const rng = s.match(TIME_RANGE);
+    if (rng) {
+      const ampm = (rng[5] || '').toLowerCase();
+      let h1 = +rng[1], m1 = +(rng[2] || 0);
+      let h2 = +rng[3], m2 = +(rng[4] || 0);
+      if (ampm === 'pm') { if (h1 < 12) h1 += 12; if (h2 < 12) h2 += 12; }
+      if (ampm === 'am' && h1 === 12) h1 = 0;
+      // if start has no ampm but end does (e.g. "9-10am"), apply to start too
+      return { time: `${pad(h1)}:${pad(m1)}`, endTime: `${pad(h2)}:${pad(m2)}`, match: rng[0] };
+    }
+    const t12 = s.match(TIME_12);
+    if (t12) {
+      let h = +t12[1], m = +(t12[2] || 0);
+      const ampm = t12[3].toLowerCase();
+      if (ampm === 'pm' && h < 12) h += 12;
+      if (ampm === 'am' && h === 12) h = 0;
+      return { time: `${pad(h)}:${pad(m)}`, endTime: '', match: t12[0] };
+    }
+    const t24 = s.match(TIME_24);
+    if (t24) return { time: `${pad(+t24[1])}:${t24[2]}`, endTime: '', match: t24[0] };
+    return null;
+  };
+
+  const parseDate = s => {
+    for (const re of DATE_RES) {
+      const m = s.match(re);
+      if (!m) continue;
+      let phrase = m[0];
+      // bare day-of-week → "this DOW" (gives today if today, else next occurrence in week)
+      if (/^(?:sun|mon|tue|wed|thu|fri|sat)/i.test(phrase) && !/^(?:next|this|last)/i.test(phrase)) {
+        phrase = 'this ' + phrase;
+      }
+      const d = DateParser.parse(phrase);
+      if (d) return { date: d, match: m[0] };
+    }
+    return null;
+  };
+
+  const inferType = (raw, hasTime, hasRange) => {
+    if (NOTE_LEAD.test(raw)) return 'note';
+    if (TODO_LEAD.test(raw)) return 'todo';
+    if (hasRange) return 'event';
+    if (EVENT_HINT.test(raw)) return 'event';
+    if (TODO_VERB.test(raw)) return 'todo';
+    if (hasTime) return 'event';
+    return 'todo';
+  };
+
+  const parse = raw => {
+    const s = (raw || '').trim();
+    if (!s) return null;
+
+    const tp = parseTime(s);
+    let stripped = tp ? s.replace(tp.match, ' ') : s;
+
+    const dp = parseDate(stripped);
+    if (dp) stripped = stripped.replace(dp.match, ' ');
+
+    // need at least a time or a date phrase to count as quick-add
+    if (!tp && !dp) return null;
+
+    const type = inferType(s, !!tp, !!(tp && tp.endTime));
+
+    const title = stripped
+      .replace(NOTE_LEAD, '').replace(TODO_LEAD, '')
+      .replace(/\b(?:on|at|@)\b/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/^[\s,\-@]+|[\s,\-@]+$/g, '')
+      .trim();
+
+    // Pure date phrase with no time and no title → defer to date-jump row
+    if (!tp && !title) return null;
+
+    return {
+      type, title,
+      date:    dp ? dp.date : today(),
+      time:    tp ? tp.time : '',
+      endTime: tp ? tp.endTime : '',
+    };
+  };
+
+  return { parse };
 })();
 
 
@@ -2200,7 +2330,7 @@ const CommandPalette = () => {
     el('div', { class: 'cmd-palette' },
       el('div', { class: 'cmd-input' },
         Icon.search(),
-        el('input', { type: 'text', placeholder: 'Search items, jump to date, switch view…',
+        el('input', { type: 'text', placeholder: 'Add "lunch w/ raghu tue 1pm", jump to date, search…',
           autocomplete: 'off',
           ref: i => { inputEl = i; setTimeout(() => i.focus(), 60); },
           onInput: e => renderResults(e.target.value),
@@ -2227,7 +2357,10 @@ const CommandPalette = () => {
 
 const computeCmdResults = q => {
   const query = q.trim().toLowerCase();
-  const out = { actions: [], date: null, items: [] };
+  const raw   = q.trim();
+  const out = { quick: null, actions: [], date: null, items: [] };
+
+  if (raw) out.quick = QuickParse.parse(raw);
 
   const allActions = [
     { ic: '+', label: 'New item',     sub: 'Create note, todo or event', fn: () => { Actions.closeCmd(); Actions.openNew(); }},
@@ -2255,9 +2388,28 @@ const computeCmdResults = q => {
 
 const buildCmdRows = results => {
   const rows = [];
+  let focusedAssigned = false;
+  const focusCls = () => { const f = !focusedAssigned ? ' focused' : ''; focusedAssigned = true; return f; };
+
+  if (results.quick) {
+    const q = results.quick;
+    const ic = q.type === 'note' ? '📝' : q.type === 'todo' ? '○' : '📅';
+    const sub = [
+      DateParser.describe(q.date),
+      q.time ? fmtTimeShort(q.time) + (q.endTime ? '–' + fmtTimeShort(q.endTime) : '') : null,
+    ].filter(Boolean).join(' · ');
+    rows.push(el('div', { class: 'cmd-section' }, 'Add'));
+    rows.push(el('div', { class: 'cmd-row' + focusCls(), onClick: () => createFromQuick(q) },
+      el('div', { class: 'cmd-row-ic ' + q.type }, ic),
+      el('div', { class: 'cmd-row-body' },
+        el('div', { class: 'cmd-row-title' },
+          q.title || `New ${q.type}`,
+          el('span', { class: 'cmd-row-tag ' + q.type }, q.type)),
+        el('div', { class: 'cmd-row-sub' }, sub))));
+  }
   if (results.date) {
     rows.push(el('div', { class: 'cmd-section' }, 'Jump to date'));
-    rows.push(el('div', { class: 'cmd-row focused', onClick: () => {
+    rows.push(el('div', { class: 'cmd-row' + focusCls(), onClick: () => {
       Actions.closeCmd();
       Actions.navigate({ name: 'day', date: results.date.d, dayMode: 'day' });
     }},
@@ -2268,8 +2420,8 @@ const buildCmdRows = results => {
   }
   if (results.actions.length) {
     rows.push(el('div', { class: 'cmd-section' }, 'Actions'));
-    results.actions.forEach((a, i) => rows.push(el('div', {
-      class: 'cmd-row' + (!results.date && i === 0 ? ' focused' : ''),
+    results.actions.forEach(a => rows.push(el('div', {
+      class: 'cmd-row' + focusCls(),
       onClick: a.fn,
     },
       el('div', { class: 'cmd-row-ic' }, a.ic),
@@ -2301,6 +2453,19 @@ const buildCmdRows = results => {
   }
   return rows;
 };
+
+const createFromQuick = q => {
+  const item = blankItem(q.date);
+  item.type    = q.type;
+  item.content = q.title;
+  item.time    = q.time;
+  item.endTime = q.endTime;
+  Actions.upsertItem(item);
+  Actions.closeCmd();
+  Actions.toast(`Added ${q.type}${q.title ? ': ' + q.title : ''}`);
+  Sync.push(item).catch(() => Actions.toast('Save failed — will retry on reload'));
+};
+
 
 /* Settings */
 
