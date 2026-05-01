@@ -2040,7 +2040,7 @@ const DayTimeline = date => {
     tlNode);
 };
 
-const TimelineEvent = item => {
+const TimelineEvent = (item, multi) => {
   const [h, m] = item.time.split(':').map(Number);
   const startMin = h * 60 + m;
   const hasEnd0  = !!item.endTime;
@@ -2050,7 +2050,7 @@ const TimelineEvent = item => {
   const dur0 = Math.max(20, endMin0 - startMin);
   const canResize = item.type === 'event';
 
-  let blockEl, timeEl, drag = null;
+  let blockEl, timeEl, drag = null, colWidth = 0;
   const fmt = mins => `${p2(Math.floor(mins/60))}:${p2(mins % 60)}`;
   const showTime = (s, d, end) =>
     fmtTimeShort(fmt(s)) + (end ? ' – ' + fmtTimeShort(fmt(s + d)) : '');
@@ -2058,16 +2058,28 @@ const TimelineEvent = item => {
   const begin = kind => () => {
     drag = { kind, start: startMin, dur: dur0,
              hasEnd: hasEnd0 || kind === 'resize',
-             curStart: startMin, curDur: dur0 };
+             curStart: startMin, curDur: dur0,
+             curCol: multi ? multi.colIndex : null };
+    if (multi && blockEl.parentElement) {
+      colWidth = blockEl.parentElement.getBoundingClientRect().width;
+    }
     blockEl.classList.add('dragging');
   };
-  const live = ({ dy }) => {
+  const live = ({ dx, dy }) => {
     if (!drag) return;
     const dMin = Math.round(dy / 15) * 15;
     if (drag.kind === 'move') {
       drag.curStart = Math.max(0, Math.min(1440 - drag.dur, drag.start + dMin));
       drag.curDur = drag.dur;
-      blockEl.style.top = drag.curStart + 'px';
+      if (multi) {
+        const colDelta = colWidth ? Math.round(dx / colWidth) : 0;
+        drag.curCol = Math.max(0, Math.min(multi.days.length - 1, multi.colIndex + colDelta));
+        const dxPx = (drag.curCol - multi.colIndex) * colWidth;
+        const dyPx = drag.curStart - drag.start;
+        blockEl.style.transform = `translate(${dxPx}px, ${dyPx}px)`;
+      } else {
+        blockEl.style.top = drag.curStart + 'px';
+      }
     } else {
       drag.curStart = drag.start;
       drag.curDur = Math.max(15, Math.min(1440 - drag.start, drag.dur + dMin));
@@ -2078,11 +2090,14 @@ const TimelineEvent = item => {
   const commit = () => {
     if (!drag) return;
     blockEl.classList.remove('dragging');
-    const { curStart, curDur, hasEnd, start, dur } = drag;
+    if (multi) blockEl.style.transform = '';
+    const { curStart, curDur, hasEnd, start, dur, curCol } = drag;
+    const colChanged = multi && curCol !== multi.colIndex;
     drag = null;
-    if (curStart === start && curDur === dur) return;
+    if (curStart === start && curDur === dur && !colChanged) return;
     const updated = { ...item, time: fmt(curStart) };
     if (hasEnd) updated.endTime = fmt(curStart + curDur);
+    if (colChanged) updated.date = ds(multi.days[curCol]);
     Actions.upsertItem(updated);
     Sync.push(updated).catch(() => Actions.toast('Save failed'));
   };
@@ -2138,7 +2153,7 @@ const MultiTimeline = date => {
             el('div', { class: 'hour-lbl', style: { position: 'absolute', top: (h * 60 - 7) + 'px' } },
               fmtHourLabel(h)))),
         // Day columns
-        days.map(d => el('div', { class: 'multi-col',
+        days.map((d, colIndex) => el('div', { class: 'multi-col',
           gesture: { onTap: () => { Actions.selectDate(d); Actions.setDayMode('day'); } }},
           // hour grid lines
           Array.from({ length: 24 }, (_, h) =>
@@ -2146,7 +2161,8 @@ const MultiTimeline = date => {
                                   height: '1px', background: 'var(--sep-th)' } })),
           // events
           el('div', { class: 'multi-col-events' },
-            sortByTime(itemsOnDate(d)).filter(i => i.time).map(TimelineEvent)))))));
+            sortByTime(itemsOnDate(d)).filter(i => i.time).map(it =>
+              TimelineEvent(it, { days, colIndex }))))))));
 };
 
 const DayLinearList = date => {
