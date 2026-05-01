@@ -1264,8 +1264,8 @@ const Sync = (() => {
 
 const Auth = {
   whenGIS(cb, tries = 0) {
-    if (typeof google !== 'undefined' && google.accounts?.oauth2) return cb();
-    if (tries > 80) return;
+    if (typeof google !== 'undefined' && google.accounts?.oauth2) return cb(true);
+    if (tries > 80) return cb(false);
     setTimeout(() => Auth.whenGIS(cb, tries + 1), 100);
   },
   signIn() {
@@ -1284,13 +1284,18 @@ const Auth = {
     return new Promise(resolve => {
       if (Date.now() < state.tokenExp) return resolve(true);
       if (typeof google === 'undefined') return resolve(false);
+      let done = false;
+      const finish = ok => { if (done) return; done = true; resolve(ok); };
+      // iOS standalone PWA can swallow the silent-auth iframe — never resolves.
+      // Time out so the app falls back to cached data instead of hanging on splash.
+      setTimeout(() => finish(false), 5000);
       google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID, scope: SCOPE,
         callback: r => {
-          if (r.error) return resolve(false);
+          if (r.error) return finish(false);
           state.token = r.access_token;
           state.tokenExp = Date.now() + r.expires_in * 1000 - 60000;
-          resolve(true);
+          finish(true);
         },
       }).requestAccessToken({ prompt: '' });
     });
@@ -2700,18 +2705,29 @@ document.addEventListener('keydown', e => {
   document.documentElement.classList.toggle('light', !state.dark);
 
   Sync.restoreCache();
+
+  const haveCachedApp = !!state.sheetId && state.items.size > 0;
+  // If we have a cached snapshot, show the app instantly so iOS PWA reopen never hangs on splash.
+  if (haveCachedApp) state.status = 'ready';
   render();
 
   if (state.sheetId) {
-    Auth.whenGIS(async () => {
-      const ok = await Auth.silentRefresh();
-      if (ok) {
-        if (state.items.size > 0) Actions.setStatus('ready');
+    Auth.whenGIS(async ok => {
+      if (!ok) {
+        // GIS script never loaded (offline / blocked). Keep cached app visible if we have one.
+        if (!haveCachedApp) Actions.setStatus('auth');
+        else Actions.toast('Offline — using cached items');
+        return;
+      }
+      const refreshed = await Auth.silentRefresh();
+      if (refreshed) {
         try { await Sync.load(); Auth.fetchUser(); Actions.setStatus('ready'); Reminders.scheduleAll(); }
         catch (e) { Actions.toast('Sync failed: ' + e.message); }
-      } else {
+      } else if (!haveCachedApp) {
+        // No cache and silent auth failed — must sign in interactively.
         Actions.setStatus('auth');
       }
+      // else: keep showing cached data; user can re-auth from Settings when ready.
     });
   } else {
     Auth.whenGIS(() => Actions.setStatus('auth'));
