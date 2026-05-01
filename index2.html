@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LifeOS">
+<title>LifeOS</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS — Apple system palette, light + dark
+   ───────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Surfaces (Apple light system) */
+  --bg-1: #FFFFFF;
+  --bg-2: #F2F2F7;
+  --bg-3: #E5E5EA;
+  --bg-4: #D1D1D6;
+  /* Labels */
+  --t-1: #000000;
+  --t-2: rgba(60,60,67,.60);
+  --t-3: rgba(60,60,67,.30);
+  --t-4: rgba(60,60,67,.18);
+  /* Separators */
+  --sep:    rgba(60,60,67,.29);
+  --sep-th: rgba(60,60,67,.12);
+  /* Apple system colors */
+  --blue:   #007AFF;
+  --green:  #34C759;
+  --indigo: #5856D6;
+  --orange: #FF9500;
+  --pink:   #FF2D55;
+  --purple: #AF52DE;
+  --red:    #FF3B30;
+  --teal:   #5AC8FA;
+  --yellow: #FFCC00;
+  --gray:   #8E8E93;
+  /* Per-item-type accent (semantic) */
+  --c-note:  var(--orange);
+  --c-todo:  var(--blue);
+  --c-event: var(--purple);
+  --c-done:  var(--green);
+  /* Spacing — 4pt grid */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
+  /* Radii */
+  --r-1: 6px; --r-2: 10px; --r-3: 14px; --r-4: 20px;
+  /* Heights */
+  --topbar-h: 44px;
+  --tabbar-h: 50px;
+  /* Safe area */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+html.dark {
+  --bg-1: #000000;
+  --bg-2: #1C1C1E;
+  --bg-3: #2C2C2E;
+  --bg-4: #3A3A3C;
+  --t-1: #FFFFFF;
+  --t-2: rgba(235,235,245,.60);
+  --t-3: rgba(235,235,245,.30);
+  --t-4: rgba(235,235,245,.18);
+  --sep:    rgba(84,84,88,.65);
+  --sep-th: rgba(84,84,88,.30);
+  --blue:   #0A84FF;
+  --green:  #30D158;
+  --indigo: #5E5CE6;
+  --orange: #FF9F0A;
+  --pink:   #FF375F;
+  --purple: #BF5AF2;
+  --red:    #FF453A;
+  --teal:   #64D2FF;
+  --yellow: #FFD60A;
+  --gray:   #8E8E93;
+}
+
+html { color-scheme: dark; }
+html.light { color-scheme: light; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+html, body { height: 100%; height: 100dvh; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.35;
+  color: var(--t-1);
+  background: var(--bg-1);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+
+button, input, textarea, select {
+  font: inherit; color: inherit; background: none; border: none; outline: none;
+  -webkit-appearance: none; appearance: none;
+}
+
+button { cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+
+a { color: var(--blue); text-decoration: none; }
+
+::selection { background: rgba(10,132,255,.25); }
+
+/* Scrollbar — minimal */
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* Type scale */
+.t-large    { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -.4px; }
+.t-title    { font-size: 22px; line-height: 1.25; font-weight: 700; letter-spacing: -.2px; }
+.t-headline { font-size: 17px; line-height: 1.3;  font-weight: 600; }
+.t-body     { font-size: 17px; line-height: 1.4;  font-weight: 400; }
+.t-callout  { font-size: 16px; line-height: 1.3;  font-weight: 400; }
+.t-subhead  { font-size: 15px; line-height: 1.3;  font-weight: 400; }
+.t-foot     { font-size: 13px; line-height: 1.4;  font-weight: 400; color: var(--t-2); }
+.t-caption  { font-size: 12px; line-height: 1.3;  font-weight: 500; color: var(--t-2); letter-spacing: .1px; }
+.t-mono     { font-family: 'SF Mono','Menlo','Cascadia Code',monospace; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ROOT LAYOUT
+   ───────────────────────────────────────────────────────────────────────────── */
+
+#root {
+  display: flex; flex-direction: column;
+  height: 100dvh; width: 100%;
+  background: var(--bg-1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOP BAR — Apple navigation bar
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.topbar {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: calc(var(--topbar-h) + var(--safe-t));
+  padding: var(--safe-t) max(var(--s-4), var(--safe-r)) 0 max(var(--s-4), var(--safe-l));
+  background: rgba(255,255,255,.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--sep);
+  position: sticky; top: 0; z-index: 10;
+}
+html.dark .topbar { background: rgba(0,0,0,.75); }
+
+.topbar-left, .topbar-right { display: flex; align-items: center; gap: var(--s-3); }
+.topbar-left { justify-self: start; }
+.topbar-right { justify-self: end; }
+.topbar-title {
+  font-size: 17px; font-weight: 600;
+  color: var(--t-1);
+  cursor: pointer; user-select: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-align: center;
+  padding: var(--s-1) var(--s-2);
+}
+
+.btn-back {
+  display: inline-flex; align-items: center; gap: 2px;
+  color: var(--blue); font-size: 17px; font-weight: 400;
+  padding: var(--s-2) 0;
+}
+.btn-back svg { width: 18px; height: 18px; }
+
+.btn-text { color: var(--blue); font-size: 17px; font-weight: 400; padding: var(--s-2); }
+.btn-text-strong { color: var(--blue); font-size: 17px; font-weight: 600; padding: var(--s-2); }
+.btn-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--blue); transition: background .12s;
+}
+.btn-icon:active { background: var(--bg-3); }
+.btn-icon svg { width: 22px; height: 22px; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CONTENT REGION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB BAR — Apple bottom tab bar
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.tabbar {
+  flex-shrink: 0;
+  display: flex;
+  height: calc(var(--tabbar-h) + var(--safe-b));
+  padding-bottom: var(--safe-b);
+  background: rgba(255,255,255,.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid var(--sep);
+  z-index: 10;
+}
+html.dark .tabbar { background: rgba(0,0,0,.75); }
+
+.tab {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  color: var(--t-2);
+  font-size: 10px; font-weight: 500; letter-spacing: .1px;
+  transition: color .1s;
+}
+.tab.on { color: var(--blue); }
+.tab svg { width: 24px; height: 24px; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   AUTH SCREEN
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.auth {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: var(--s-6) var(--s-5);
+  gap: var(--s-5);
+  background: var(--bg-1);
+}
+.auth-logo {
+  width: 80px; height: 80px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 40px;
+  box-shadow: 0 10px 40px rgba(0,122,255,.25);
+}
+.auth-name { font-size: 32px; font-weight: 700; letter-spacing: -.4px; }
+.auth-sub { color: var(--t-2); text-align: center; font-size: 16px; max-width: 280px; }
+.auth-btn {
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  padding: 12px 22px;
+  background: var(--t-1); color: var(--bg-1);
+  border-radius: 12px;
+  font-size: 16px; font-weight: 600;
+  transition: opacity .12s;
+}
+.auth-btn:active { opacity: .7; }
+.auth-btn svg { width: 18px; height: 18px; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SPLASH (initial loading)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.splash {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--bg-1);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--s-4);
+}
+.splash-spin {
+  width: 24px; height: 24px;
+  border: 2.5px solid var(--bg-3); border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.splash-msg { color: var(--t-2); font-size: 14px; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMMON COMPONENTS — buttons, inputs, sheets
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.btn-pill {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  background: rgba(120,120,128,.16);
+  border-radius: 100px;
+  color: var(--blue); font-weight: 500; font-size: 15px;
+}
+
+.input {
+  width: 100%;
+  background: var(--bg-2);
+  border-radius: var(--r-2);
+  padding: 11px 14px;
+  font-size: 17px;
+  color: var(--t-1);
+  border: 1px solid transparent;
+  transition: border-color .15s;
+}
+.input:focus { border-color: var(--blue); }
+.input::placeholder { color: var(--t-3); }
+
+textarea.input { resize: none; min-height: 88px; line-height: 1.45; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOAST
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--s-4));
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--bg-3); color: var(--t-1);
+  padding: 10px 16px; border-radius: 100px;
+  font-size: 14px; font-weight: 500;
+  box-shadow: 0 6px 24px rgba(0,0,0,.3);
+  border: 0.5px solid var(--sep-th);
+  pointer-events: none; opacity: 0;
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  z-index: 9999;
+  white-space: nowrap; max-width: 90vw;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MONTH VIEW (skeleton — full implementation in Session 2)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.month {
+  display: flex; flex-direction: column;
+  height: 100%;
+  background: var(--bg-1);
+}
+
+.month-dow {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  padding: 0 var(--s-2);
+  border-bottom: 0.5px solid var(--sep-th);
+  flex-shrink: 0;
+}
+.month-dow > div {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 11px; font-weight: 600;
+  color: var(--t-2); letter-spacing: .5px;
+  text-transform: uppercase;
+}
+.month-dow > div.weekend { color: var(--t-3); }
+
+.month-grid {
+  display: grid; grid-template-columns: repeat(7,1fr); grid-auto-rows: 1fr;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid var(--sep);
+}
+
+.day-cell {
+  position: relative;
+  padding: var(--s-1) var(--s-1) 0;
+  display: flex; flex-direction: column; align-items: center;
+  min-height: 56px;
+  border-top: 0.5px solid var(--sep-th);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.day-cell.other-month .day-num { color: var(--t-3); }
+.day-num {
+  font-size: 17px; font-weight: 400;
+  color: var(--t-1);
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+.day-cell.today .day-num {
+  background: var(--red); color: white;
+  font-weight: 600;
+}
+.day-cell.selected .day-num {
+  background: var(--t-1); color: var(--bg-1);
+  font-weight: 600;
+}
+.day-cell.today.selected .day-num { background: var(--red); }
+
+.day-marks {
+  display: flex; gap: 2px; margin-top: 3px;
+  min-height: 4px;
+}
+.day-mark { width: 4px; height: 4px; border-radius: 50%; }
+.day-mark.note  { background: var(--c-note); }
+.day-mark.todo  { background: var(--c-todo); }
+.day-mark.event { background: var(--c-event); }
+
+/* Day list below the month grid */
+.day-list {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--s-3) 0 var(--s-6);
+}
+.day-list-header {
+  padding: var(--s-3) var(--s-4) var(--s-2);
+  font-size: 14px; font-weight: 600;
+  color: var(--t-2);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.day-list-header strong { color: var(--t-1); font-weight: 700; text-transform: none; letter-spacing: 0; font-size: 17px; display: block; margin-bottom: 2px; }
+
+.empty-state {
+  padding: var(--s-7) var(--s-5);
+  text-align: center;
+  color: var(--t-3);
+  font-size: 15px;
+}
+
+/* Item row */
+.item-row {
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  padding: 11px var(--s-4);
+  cursor: default;
+  position: relative;
+  transition: background .08s;
+}
+.item-row + .item-row::before {
+  content: ''; position: absolute; left: 56px; right: 0; top: 0;
+  border-top: 0.5px solid var(--sep-th);
+}
+.item-row:active { background: var(--bg-2); }
+.item-row.done .item-content { color: var(--t-3); text-decoration: line-through; }
+
+.item-bar {
+  width: 4px; flex-shrink: 0;
+  align-self: stretch; min-height: 22px;
+  border-radius: 2px;
+  margin-top: 2px;
+}
+.item-bar.note  { background: var(--c-note); }
+.item-bar.todo  { background: var(--c-todo); }
+.item-bar.event { background: var(--c-event); }
+
+.item-time {
+  flex-shrink: 0; min-width: 56px;
+  font-size: 13px; color: var(--t-2);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.item-time.allday { color: var(--t-3); font-style: italic; }
+
+.item-body { flex: 1; min-width: 0; }
+.item-content { font-size: 16px; line-height: 1.3; color: var(--t-1); word-break: break-word; }
+.item-meta { display: flex; gap: var(--s-2); margin-top: 2px; align-items: center; }
+
+.item-checkbox {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--t-3);
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+  transition: all .15s;
+}
+.item-checkbox.on { background: var(--green); border-color: var(--green); color: white; }
+.item-checkbox.on::after { content: '✓'; font-size: 13px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div class="splash">
+    <div class="splash-spin"></div>
+    <div class="splash-msg">Loading…</div>
+  </div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+'use strict';
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   LIFEOS — clean rebuild
+   Single file. Sections in order:
+     1. UTILS         — pure helpers, DOM builder
+     2. CONFIG        — constants, schema
+     3. STATE         — single tree, update fn, subscribe
+     4. ACTIONS       — every mutation, named
+     5. SYNC          — Sheets adapter, write queue, schema migration
+     6. AUTH          — Google OAuth flow
+     7. GESTURES      — single pointer-event dispatcher
+     8. DATE PARSER   — natural language → Date
+     9. RENDER        — root render, slot caching
+    10. COMPONENTS    — TopBar, MonthView, DayView (stubs in S1)
+    11. BOOT          — bootstrap
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─── 1. UTILS ──────────────────────────────────────────────────────────── */
+
+const $       = id => document.getElementById(id);
+const p2      = n => String(n).padStart(2, '0');
+const today   = () => new Date();
+const ds      = d => `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+const parseDs = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); };
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate()+n);
+const addMos  = (d, n) => new Date(d.getFullYear(), d.getMonth()+n, 1);
+const sameDay = (a, b) => ds(a) === ds(b);
+const wkStart = d => addDays(d, -d.getDay());
+const startOfMonth = d => new Date(d.getFullYear(), d.getMonth(), 1);
+const endOfMonth   = d => new Date(d.getFullYear(), d.getMonth()+1, 0);
+
+const uid  = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const bool = x => x ? 'TRUE' : 'FALSE';
+const esc  = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const fmtTime = t => {
+  if (!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  return `${h%12 || 12}:${p2(m)} ${h>=12 ? 'PM' : 'AM'}`;
+};
+
+const fmtTimeShort = t => {
+  if (!t) return '';
+  const [h,m] = t.split(':').map(Number);
+  const ap = h>=12 ? 'PM' : 'AM';
+  return m === 0 ? `${h%12||12} ${ap}` : `${h%12||12}:${p2(m)} ${ap}`;
+};
+
+/* DOM builder. Components are pure functions returning elements built with this.
+   Norvig-style: one small primitive that composes into everything else.
+
+   Examples:
+     el('button', { onClick: foo }, 'Save')
+     el('div', { class: 'row' }, el('span', {}, 'a'), el('span', {}, 'b'))
+     el('input', { type: 'text', value: x, onInput: e => set(e.target.value) })            */
+const el = (tag, attrs, ...kids) => {
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === 'class')        n.className = v;
+    else if (k === 'style')   typeof v === 'string' ? n.setAttribute('style', v) : Object.assign(n.style, v);
+    else if (k === 'dataset') Object.assign(n.dataset, v);
+    else if (k === 'gesture') Gestures.on(n, v);
+    else if (k === 'ref')     v(n);
+    else if (k === 'html')    n.innerHTML = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), v);
+    else                      n.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    n.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return n;
+};
+
+/* SVG icon shorthand — Apple SF Symbols-flavor, hand-rolled minimal set.
+   Each is a function returning a rendered <svg> element. */
+const Icon = {
+  back:    () => svg('M15 18l-6-6 6-6', 2),
+  plus:    () => svg('M12 5v14M5 12h14', 2.5),
+  cal:     () => svg('M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM3 10h18M16 2v4M8 2v4', 1.8),
+  list:    () => svg('M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01', 2),
+  search:  () => svg('M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35', 2),
+  user:    () => svg('M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z', 1.8),
+};
+function svg(d, w) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const el = document.createElementNS(ns, 'svg');
+  el.setAttribute('viewBox','0 0 24 24'); el.setAttribute('fill','none');
+  el.setAttribute('stroke','currentColor'); el.setAttribute('stroke-width', w || 1.8);
+  el.setAttribute('stroke-linecap','round'); el.setAttribute('stroke-linejoin','round');
+  const p = document.createElementNS(ns,'path'); p.setAttribute('d', d);
+  el.appendChild(p);
+  return el;
+}
+
+
+/* ─── 2. CONFIG ─────────────────────────────────────────────────────────── */
+
+const CLIENT_ID  = '348308608113-0mava56gnj2bqn8lqsd80k366643nr6p.apps.googleusercontent.com';
+const SCOPE      = 'https://www.googleapis.com/auth/spreadsheets'
+               + ' https://www.googleapis.com/auth/drive.file'
+               + ' https://www.googleapis.com/auth/drive.metadata.readonly';
+const SHEET_NAME = 'LifeOS';
+const TAB_NAME   = 'Items';
+
+/* 18-column schema. Each cell holds one concept — no JSON, no parsing.
+   Columns A–I are stable from the old format; J–R are new (split). */
+const HEADER = [
+  'id','type','content','date','time','completed','created_at','deleted','end_time',
+  'rem_start','rem_every','rem_times',
+  'att_kind','att_drive_id','att_thumb','att_name','att_dur','att_size'
+];
+
+const MON  = ['January','February','March','April','May','June',
+              'July','August','September','October','November','December'];
+const DOW  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DOWA = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DOW1 = ['S','M','T','W','T','F','S'];
+
+
+/* ─── 3. STATE ──────────────────────────────────────────────────────────── */
+
+/* The single source of truth. Mutated only through Actions.
+   After any mutation, notify() is called and render reacts. */
+const state = {
+  items:    new Map(),                    // id → Item
+  view:     { name: 'month', date: today() },  // 'month' | 'day' | 'list'
+  history:  [],                           // navigation back-stack
+  modal:    null,                         // null | { mode, item }
+  ctx:      null,                         // null | context menu
+  toast:    null,
+  dark:     localStorage.getItem('lo_dark') !== 'false',
+  user:     null,
+  sheetId:  localStorage.getItem('lo_sid') || null,
+  tabId:    null,
+  token:    null,
+  tokenExp: 0,
+  status:   'splash',                     // 'splash' | 'auth' | 'loading' | 'ready'
+};
+
+const subs = new Set();
+const subscribe = fn => { subs.add(fn); return () => subs.delete(fn); };
+const notify = () => subs.forEach(fn => fn(state));
+
+
+/* ─── 4. ACTIONS ────────────────────────────────────────────────────────── */
+
+/* Every mutation goes through one of these. Pure intent, no rendering inside.
+   The render layer subscribes and reacts. */
+
+const Actions = {
+
+  /* navigation */
+  navigate(view) {
+    state.history.push(state.view);
+    state.view = view;
+    notify();
+  },
+  back() {
+    if (!state.history.length) return;
+    state.view = state.history.pop();
+    notify();
+  },
+  goToday() {
+    state.view = { ...state.view, date: today() };
+    notify();
+  },
+  selectDate(date) {
+    state.view = { ...state.view, date };
+    notify();
+  },
+
+  /* items */
+  upsertItem(item) {
+    state.items.set(item.id, item);
+    notify();
+  },
+  deleteItem(id) {
+    state.items.delete(id);
+    notify();
+  },
+
+  /* modal */
+  openNew(date) {
+    state.modal = { mode: 'new', item: blankItem(date || state.view.date) };
+    notify();
+  },
+  openEdit(id) {
+    const it = state.items.get(id);
+    if (it) { state.modal = { mode: 'edit', item: { ...it } }; notify(); }
+  },
+  closeModal() {
+    state.modal = null;
+    notify();
+  },
+
+  /* context menu */
+  openCtx(x, y, items) {
+    state.ctx = { x, y, items };
+    notify();
+  },
+  closeCtx() {
+    state.ctx = null;
+    notify();
+  },
+
+  /* toast */
+  toast(msg, kind = 'info') {
+    state.toast = { msg, kind, ts: Date.now() };
+    notify();
+    const ts = state.toast.ts;
+    setTimeout(() => { if (state.toast?.ts === ts) { state.toast = null; notify(); } }, 2400);
+  },
+
+  /* theme */
+  setDark(dark) {
+    state.dark = dark;
+    localStorage.setItem('lo_dark', dark);
+    document.documentElement.classList.toggle('dark', dark);
+    document.documentElement.classList.toggle('light', !dark);
+    notify();
+  },
+
+  /* status */
+  setStatus(status) {
+    state.status = status;
+    notify();
+  },
+};
+
+const blankItem = (date) => ({
+  id: uid(),
+  type: 'note',
+  content: '',
+  date: date ? ds(date) : '',
+  time: '', endTime: '',
+  completed: false,
+  createdAt: new Date().toISOString(),
+  deleted: false,
+  remStart: null, remEvery: 0, remTimes: 1,
+  attKind: null, attDriveId: '', attThumb: '', attName: '', attDur: 0, attSize: 0,
+  _row: null,
+});
+
+
+/* ─── 5. SYNC ───────────────────────────────────────────────────────────── */
+
+/* Google Sheets adapter. Two responsibilities:
+     (a) read items from the sheet (with schema migration: old 11-col → new 18-col)
+     (b) write changes back, serialized through a queue, with explicit row indices
+
+   No more :append, no more table-boundary detection. We compute the target row
+   ourselves and send updateCells with start.{rowIndex, columnIndex:0}. Bulletproof. */
+
+const Sync = (() => {
+  const BASE = 'https://sheets.googleapis.com/v4/spreadsheets';
+  const DRIVE = 'https://www.googleapis.com/drive/v3';
+
+  const auth = () => ({ Authorization: `Bearer ${state.token}`, 'Content-Type': 'application/json' });
+
+  const req = (method, url, body) => fetch(url, {
+    method, headers: auth(), body: body && JSON.stringify(body)
+  }).then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(`${r.status}: ${t}`))));
+
+  const get  = path        => req('GET',  `${BASE}${path}`);
+  const post = (path, body) => req('POST', `${BASE}${path}`, body);
+  const put  = (path, body) => req('PUT',  `${BASE}${path}`, body);
+
+  /* ── SCHEMA: row ↔ item ── */
+
+  const toRow = (i) => [
+    i.id, i.type, i.content, i.date || '', i.time || '',
+    bool(i.completed), i.createdAt, bool(i.deleted), i.endTime || '',
+    i.remStart != null ? String(i.remStart) : '', String(i.remEvery || 0), String(i.remTimes || 1),
+    i.attKind || '', i.attDriveId || '', i.attThumb || '',
+    i.attName || '', i.attDur ? String(i.attDur) : '', i.attSize ? String(i.attSize) : '',
+  ];
+
+  /* Detect old-format rows by looking at column J (index 9).
+     Old format: JSON or URL-encoded JSON for reminders  → starts with '{' or '%7B'
+     New format: a number, or empty                       → digits or empty */
+  const isOldRow = (row) => {
+    const j = row[9];
+    if (!j) return false;
+    return j.startsWith('{') || j.startsWith('%7B') || j.includes('"');
+  };
+
+  const tryParse = (s) => {
+    try { return JSON.parse(s.startsWith('%7B') ? decodeURIComponent(s) : s); }
+    catch (_) { return null; }
+  };
+
+  const fromRow = (row, idx) => {
+    const item = {
+      id:        row[0] || '',
+      type:      row[1] || 'note',
+      content:   row[2] || '',
+      date:      row[3] || '',
+      time:      row[4] || '',
+      completed: row[5] === 'TRUE',
+      createdAt: row[6] || '',
+      deleted:   row[7] === 'TRUE',
+      endTime:   row[8] || '',
+      remStart: null, remEvery: 0, remTimes: 1,
+      attKind: null, attDriveId: '', attThumb: '', attName: '', attDur: 0, attSize: 0,
+      _row:      idx + 2,
+    };
+
+    if (isOldRow(row)) {
+      // Old format: J = reminders JSON, K = attachment JSON
+      const r = tryParse(row[9]) || {};
+      item.remStart = r.start ?? null;
+      item.remEvery = r.every ?? 0;
+      item.remTimes = r.times ?? 1;
+      const a = tryParse(row[10] || '') || {};
+      if (a.type) {
+        item.attKind     = a.type;
+        item.attDriveId  = a.id   || '';
+        item.attThumb    = a.thumb|| '';
+        item.attDur      = a.dur  || 0;
+      }
+    } else {
+      // New format
+      item.remStart = row[9]  ? +row[9]  : null;
+      item.remEvery = row[10] ? +row[10] : 0;
+      item.remTimes = row[11] ? +row[11] : 1;
+      item.attKind     = row[12] || null;
+      item.attDriveId  = row[13] || '';
+      item.attThumb    = row[14] || '';
+      item.attName     = row[15] || '';
+      item.attDur      = row[16] ? +row[16] : 0;
+      item.attSize     = row[17] ? +row[17] : 0;
+    }
+    return item;
+  };
+
+  /* ── DRIVE: find or create the LifeOS sheet by name ── */
+
+  const findOrCreate = async () => {
+    if (state.sheetId) {
+      try { await get(`/${state.sheetId}?fields=spreadsheetId`); return; }
+      catch (_) { state.sheetId = null; localStorage.removeItem('lo_sid'); }
+    }
+    const found = await fetch(
+      `${DRIVE}/files?q=${encodeURIComponent(`name='${SHEET_NAME}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`)}&fields=files(id)&orderBy=modifiedTime+desc&pageSize=5`,
+      { headers: auth() }
+    ).then(r => r.json());
+    if (found.files?.length) {
+      state.sheetId = found.files[0].id;
+    } else {
+      const ss = await post('', {
+        properties: { title: SHEET_NAME },
+        sheets: [{ properties: { title: TAB_NAME } }],
+      });
+      state.sheetId = ss.spreadsheetId;
+    }
+    localStorage.setItem('lo_sid', state.sheetId);
+  };
+
+  const ensureTab = async () => {
+    const meta = await get(`/${state.sheetId}?fields=sheets.properties`);
+    const tab  = meta.sheets.find(s => s.properties.title === TAB_NAME);
+    state.tabId = (tab || meta.sheets[0]).properties.sheetId;
+    if (!tab) {
+      await post(`/${state.sheetId}:batchUpdate`, {
+        requests: [{ addSheet: { properties: { title: TAB_NAME } } }],
+      });
+    }
+    // Always rewrite header to the new 18-col schema.
+    await put(`/${state.sheetId}/values/${TAB_NAME}!A1:R1?valueInputOption=RAW`,
+              { values: [HEADER] });
+  };
+
+  /* ── LOAD: pull all items, populate state ── */
+
+  const load = async () => {
+    await findOrCreate();
+    await ensureTab();
+    const data = await get(`/${state.sheetId}/values/${TAB_NAME}!A2:R3000`);
+    const rows = data.values || [];
+    state.items.clear();
+    for (let i = 0; i < rows.length; i++) {
+      const item = fromRow(rows[i], i);
+      if (item.id && !item.deleted) state.items.set(item.id, item);
+    }
+    cacheItems();
+  };
+
+  /* ── WRITE QUEUE ── */
+
+  let _q = Promise.resolve();
+  const queue = (fn) => { const next = _q.catch(()=>{}).then(fn); _q = next.catch(()=>{}); return next; };
+
+  /* Calculate the next available row from local state. Always correct after load. */
+  const nextRow = () => {
+    let max = 1;  // header is row 1
+    for (const it of state.items.values()) if (it._row && it._row > max) max = it._row;
+    return max + 1;
+  };
+
+  /* updateCells with explicit start.rowIndex + columnIndex:0 — no boundary
+     detection, no table magic. Writes exactly where we say. */
+  const writeRow = (rowIdx, row) =>
+    post(`/${state.sheetId}:batchUpdate`, { requests: [{ updateCells: {
+      start: { sheetId: state.tabId, rowIndex: rowIdx, columnIndex: 0 },
+      rows:  [{ values: row.map(v => ({ userEnteredValue: { stringValue: String(v ?? '') } })) }],
+      fields: 'userEnteredValue',
+    }}]});
+
+  const insert = (item) => queue(async () => {
+    if (!state.tabId) await ensureTab();
+    const rowNum = nextRow();
+    item._row = rowNum;
+    await writeRow(rowNum - 1, toRow(item));
+    cacheItems();
+  });
+
+  const update = (item) => queue(async () => {
+    if (!item._row) return insert(item);
+    await writeRow(item._row - 1, toRow(item));
+    cacheItems();
+  });
+
+  const remove = (item) => queue(async () => {
+    if (!item._row) return;
+    await post(`/${state.sheetId}:batchUpdate`, { requests: [{ deleteDimension: {
+      range: { sheetId: state.tabId, dimension: 'ROWS', startIndex: item._row - 1, endIndex: item._row },
+    }}]});
+    // Row indices shifted up — refetch to stay in sync.
+    await load();
+  });
+
+  /* push: dispatch insert vs update based on _row presence */
+  const push = (item) => item._row ? update(item) : insert(item);
+
+  /* ── LOCAL CACHE ── */
+
+  const cacheItems = () => {
+    try { localStorage.setItem('lo_cache', JSON.stringify([...state.items.values()])); }
+    catch (_) {}
+  };
+
+  const restoreCache = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem('lo_cache') || '[]');
+      state.items.clear();
+      for (const it of arr) state.items.set(it.id, it);
+    } catch (_) {}
+  };
+
+  return { load, push, remove, restoreCache };
+})();
+
+
+/* ─── 6. AUTH ───────────────────────────────────────────────────────────── */
+
+const Auth = {
+  whenGIS(cb, tries = 0) {
+    if (typeof google !== 'undefined' && google.accounts?.oauth2) return cb();
+    if (tries > 80) return;
+    setTimeout(() => Auth.whenGIS(cb, tries + 1), 100);
+  },
+
+  signIn() {
+    if (typeof google === 'undefined') return Actions.toast('Google script not loaded');
+    google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID, scope: SCOPE,
+      callback: async r => {
+        if (r.error) return Actions.toast('Sign-in: ' + r.error);
+        state.token = r.access_token;
+        state.tokenExp = Date.now() + r.expires_in * 1000 - 60000;
+        await Auth.boot();
+      },
+    }).requestAccessToken({ prompt: 'select_account' });
+  },
+
+  silentRefresh() {
+    return new Promise(resolve => {
+      if (Date.now() < state.tokenExp) return resolve(true);
+      if (typeof google === 'undefined') return resolve(false);
+      google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID, scope: SCOPE,
+        callback: r => {
+          if (r.error) return resolve(false);
+          state.token = r.access_token;
+          state.tokenExp = Date.now() + r.expires_in * 1000 - 60000;
+          resolve(true);
+        },
+      }).requestAccessToken({ prompt: '' });
+    });
+  },
+
+  async boot() {
+    Actions.setStatus('loading');
+    try {
+      await Sync.load();
+      Auth.fetchUser();
+      Actions.setStatus('ready');
+    } catch (e) {
+      console.error(e);
+      Actions.toast('Could not load: ' + e.message);
+      Actions.setStatus('auth');
+    }
+  },
+
+  async fetchUser() {
+    if (!state.token) return;
+    try {
+      const u = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',
+        { headers: { Authorization: `Bearer ${state.token}` } }).then(r => r.json());
+      state.user = u;
+      notify();
+    } catch (_) {}
+  },
+
+  signOut() {
+    state.token = null; state.tokenExp = 0;
+    state.items.clear(); state.user = null;
+    localStorage.removeItem('lo_cache');
+    Actions.setStatus('auth');
+  },
+};
+
+
+/* ─── 7. GESTURES ───────────────────────────────────────────────────────── */
+
+/* Single pointer-event dispatcher. Distinguishes tap, long-press, drag.
+   Components register handlers per element via `gesture: { ... }` on el().
+   No touch-action conflicts, no competing listeners — ONE truth. */
+
+const Gestures = (() => {
+  const handlers = new WeakMap();
+  let p = null;
+
+  const find = (target) => {
+    for (let n = target; n; n = n.parentElement) {
+      if (handlers.has(n)) return [n, handlers.get(n)];
+    }
+    return [null, null];
+  };
+
+  const on = (node, fns) => { handlers.set(node, fns); };
+
+  addEventListener('pointerdown', e => {
+    if (!e.isPrimary) return;
+    const [node, fns] = find(e.target);
+    if (!fns) return;
+    p = {
+      node, fns, x0: e.clientX, y0: e.clientY, t0: Date.now(),
+      moved: false, longTimer: null, consumed: false,
+    };
+    if (fns.onLongPress) {
+      p.longTimer = setTimeout(() => {
+        if (p && !p.moved) { p.consumed = true; fns.onLongPress({ x: p.x0, y: p.y0, node }); }
+      }, 500);
+    }
+  });
+
+  addEventListener('pointermove', e => {
+    if (!p) return;
+    const dx = e.clientX - p.x0, dy = e.clientY - p.y0;
+    if (!p.moved && Math.hypot(dx, dy) > 10) {
+      p.moved = true;
+      clearTimeout(p.longTimer);
+    }
+    if (p.moved && p.fns.onDrag) p.fns.onDrag({ dx, dy });
+  });
+
+  const finish = (e) => {
+    if (!p) return;
+    clearTimeout(p.longTimer);
+    if (!p.consumed) {
+      if (!p.moved && p.fns.onTap) p.fns.onTap({ x: p.x0, y: p.y0, node: p.node, event: e });
+      else if (p.moved && p.fns.onSwipe) {
+        const dx = e.clientX - p.x0, dy = e.clientY - p.y0;
+        p.fns.onSwipe({ dx, dy });
+      }
+    }
+    p = null;
+  };
+
+  addEventListener('pointerup', finish);
+  addEventListener('pointercancel', () => { if (p) clearTimeout(p.longTimer); p = null; });
+
+  return { on };
+})();
+
+
+/* ─── 8. DATE PARSER ────────────────────────────────────────────────────── */
+
+/* Natural-language → Date for the command palette quick-jump.
+   Returns null if not parseable. */
+
+const DateParser = (() => {
+
+  const HOLIDAYS = {
+    'christmas':   y => new Date(y, 11, 25),
+    'newyear':     y => new Date(y, 0, 1),
+    'newyears':    y => new Date(y, 0, 1),
+    'halloween':   y => new Date(y, 9, 31),
+    'valentines':  y => new Date(y, 1, 14),
+    'thanksgiving':y => { // 4th Thursday of November
+      const d = new Date(y, 10, 1);
+      const offset = (4 - d.getDay() + 7) % 7;
+      return new Date(y, 10, 1 + offset + 21);
+    },
+    'july4':       y => new Date(y, 6, 4),
+  };
+
+  const parse = (raw) => {
+    const s = (raw || '').trim();
+    if (!s) return null;
+    const lc = s.toLowerCase();
+    const t  = today();
+
+    // Today / tomorrow / yesterday
+    if (lc === 'today') return t;
+    if (/^tom(orrow)?$/.test(lc)) return addDays(t, 1);
+    if (/^yest(erday)?$/.test(lc)) return addDays(t, -1);
+
+    // "next/this/last <day-of-week>"
+    const dow = lc.match(/^(next|this|last)\s+(sun|mon|tue|wed|thu|fri|sat)/);
+    if (dow) {
+      const target = ['sun','mon','tue','wed','thu','fri','sat'].indexOf(dow[2]);
+      let diff = target - t.getDay();
+      if (dow[1] === 'next' && diff <= 0) diff += 7;
+      if (dow[1] === 'last' && diff >= 0) diff -= 7;
+      if (dow[1] === 'this' && diff < 0)  diff += 7;
+      return addDays(t, diff);
+    }
+
+    // "in N {day|week|month|year}s" / "N ... ago"
+    const rel = lc.match(/^(?:in\s+)?(\d+)\s+(day|week|month|year)s?(\s+ago)?$/);
+    if (rel) {
+      const n    = parseInt(rel[1], 10) * (rel[3] ? -1 : 1);
+      const unit = rel[2];
+      const d    = new Date(t);
+      if      (unit === 'day')   d.setDate(d.getDate() + n);
+      else if (unit === 'week')  d.setDate(d.getDate() + n * 7);
+      else if (unit === 'month') d.setMonth(d.getMonth() + n);
+      else if (unit === 'year')  d.setFullYear(d.getFullYear() + n);
+      return d;
+    }
+
+    // Holidays. Optional year suffix, e.g. "christmas 2030".
+    const yMatch = s.match(/(\d{4})/);
+    const year   = yMatch ? +yMatch[1] : t.getFullYear();
+    const word   = lc.replace(/\d{4}/, '').replace(/[^a-z]/g, '');
+    const fn     = HOLIDAYS[word];
+    if (fn) return fn(year);
+
+    // Fall through to JS Date constructor (handles "Mar 10 1997", "3/10/97",
+    // "2026-12-31", and many others).
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d;
+
+    return null;
+  };
+
+  const describe = (d) => {
+    if (!d) return null;
+    const t       = today();
+    const days    = Math.round((d - t) / 86400000);
+    const main    = `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    let rel = '';
+    if      (days === 0)               rel = ' · today';
+    else if (days === 1)               rel = ' · tomorrow';
+    else if (days === -1)              rel = ' · yesterday';
+    else if (days > 0 && days < 365)   rel = ` · in ${days} days`;
+    else if (days < 0 && days > -365)  rel = ` · ${-days} days ago`;
+    else if (Math.abs(days) >= 365) {
+      const yrs = Math.round(Math.abs(days) / 365);
+      rel = days > 0 ? ` · in ${yrs} year${yrs>1?'s':''}` : ` · ${yrs} year${yrs>1?'s':''} ago`;
+    }
+    return main + rel;
+  };
+
+  return { parse, describe };
+})();
+
+
+/* ─── 9. RENDER ─────────────────────────────────────────────────────────── */
+
+/* One render entry point. Subscribed to state changes.
+   For Session 1 this is a full re-render (simple). Session 2 introduces
+   slot-based re-rendering for components whose state slice didn't change,
+   to preserve focus / scroll. */
+
+const root = $('root');
+
+let _rafScheduled = false;
+const scheduleRender = () => {
+  if (_rafScheduled) return;
+  _rafScheduled = true;
+  requestAnimationFrame(() => {
+    _rafScheduled = false;
+    renderApp();
+  });
+};
+
+subscribe(scheduleRender);
+
+const renderApp = () => {
+  // Apply theme class
+  document.documentElement.classList.toggle('dark', state.dark);
+  document.documentElement.classList.toggle('light', !state.dark);
+
+  // Build the root tree based on top-level status
+  const tree =
+    state.status === 'splash'  ? Splash() :
+    state.status === 'auth'    ? AuthScreen() :
+    state.status === 'loading' ? Splash('Loading your items…') :
+    state.status === 'ready'   ? AppShell() :
+                                 Splash();
+
+  root.replaceChildren(tree);
+
+  // Toast (overlay, lives outside main tree)
+  if (state.toast) renderToast();
+};
+
+let _toastEl = null;
+const renderToast = () => {
+  if (_toastEl) _toastEl.remove();
+  _toastEl = el('div', { class: 'toast' }, state.toast.msg);
+  document.body.appendChild(_toastEl);
+  requestAnimationFrame(() => _toastEl.classList.add('show'));
+  setTimeout(() => { _toastEl?.remove(); _toastEl = null; }, 2400);
+};
+
+
+/* ─── 10. COMPONENTS ────────────────────────────────────────────────────── */
+
+/* Pure functions of state → DOM tree. Built using el().
+   Session 1 includes the bare minimum to render a working sign-in flow and
+   a basic month view. Session 2 fills in DayView, ListView, Modal, ContextMenu,
+   CommandPalette. */
+
+const Splash = (msg = 'Loading…') =>
+  el('div', { class: 'splash' },
+    el('div', { class: 'splash-spin' }),
+    el('div', { class: 'splash-msg' }, msg));
+
+const AuthScreen = () =>
+  el('div', { class: 'auth' },
+    el('div', { class: 'auth-logo' }, '📅'),
+    el('div', { class: 'auth-name' }, 'LifeOS'),
+    el('div', { class: 'auth-sub' }, 'Calendar, todos and notes — in your Google Drive'),
+    el('button', { class: 'auth-btn', onClick: Auth.signIn },
+      'Sign in with Google'));
+
+const AppShell = () =>
+  el('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } },
+    TopBar(),
+    el('div', { class: 'content' }, currentView()),
+    TabBar());
+
+const TopBar = () => {
+  const { view } = state;
+  const canBack = state.history.length > 0;
+  const title = titleFor(view);
+
+  return el('header', { class: 'topbar' },
+    el('div', { class: 'topbar-left' },
+      canBack && el('button', { class: 'btn-back', onClick: Actions.back },
+        Icon.back(), 'Back')),
+    el('div', { class: 'topbar-title', onClick: () => Actions.back() }, title),
+    el('div', { class: 'topbar-right' },
+      el('button', { class: 'btn-text', onClick: Actions.goToday }, 'Today'),
+      el('button', { class: 'btn-icon', onClick: () => Actions.openNew() }, Icon.plus())));
+};
+
+const titleFor = (view) => {
+  const d = view.date;
+  if (view.name === 'month') return `${MON[d.getMonth()]} ${d.getFullYear()}`;
+  if (view.name === 'day')   return `${DOWA[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`;
+  if (view.name === 'list')  return 'List';
+  return '';
+};
+
+const TabBar = () =>
+  el('nav', { class: 'tabbar' },
+    Tab('cal',  'Calendar', Icon.cal,    state.view.name === 'month' || state.view.name === 'day'),
+    Tab('list', 'List',     Icon.list,   state.view.name === 'list'),
+    Tab('search','Search',  Icon.search, false),
+    Tab('user', 'Profile',  Icon.user,   false));
+
+const Tab = (key, label, iconFn, on) =>
+  el('button', { class: 'tab' + (on ? ' on' : ''),
+    onClick: () => {
+      if (key === 'cal')   Actions.navigate({ name: 'month', date: state.view.date });
+      if (key === 'list')  Actions.navigate({ name: 'list', date: state.view.date });
+      if (key === 'search') Actions.toast('Search coming in Session 2');
+      if (key === 'user')   Actions.toast('Settings coming in Session 2');
+    }},
+    iconFn(),
+    el('span', {}, label));
+
+const currentView = () => {
+  switch (state.view.name) {
+    case 'month': return MonthView();
+    case 'day':   return DayViewStub();
+    case 'list':  return ListViewStub();
+    default:      return el('div', {});
+  }
+};
+
+/* MonthView — Session 1 includes the calendar grid + selected day list.
+   Apple-style: clean grid above, day's items list below. No floating sheets. */
+const MonthView = () => {
+  const sel = state.view.date;
+  const cells = monthCells(sel);
+  const dayItems = sortByTime(itemsOnDate(sel));
+
+  return el('div', { class: 'month' },
+    // Day-of-week header
+    el('div', { class: 'month-dow' },
+      DOW1.map((d, i) => el('div', { class: (i === 0 || i === 6) ? 'weekend' : '' }, d))),
+    // Grid (6 weeks)
+    el('div', { class: 'month-grid' },
+      cells.map(cell => DayCell(cell, sel))),
+    // Day's items list below
+    DayList(sel, dayItems));
+};
+
+const DayCell = (cell, selDate) => {
+  const isSel   = sameDay(cell.date, selDate);
+  const isToday = sameDay(cell.date, today());
+  const isOther = cell.month !== selDate.getMonth();
+  const items   = itemsOnDate(cell.date);
+  const types   = uniq(items.map(i => i.completed ? 'done' : i.type)).slice(0, 3);
+
+  return el('div', {
+      class: 'day-cell'
+        + (isOther ? ' other-month' : '')
+        + (isToday ? ' today' : '')
+        + (isSel   ? ' selected' : ''),
+      gesture: {
+        onTap: () => Actions.selectDate(cell.date),
+        onLongPress: () => Actions.openNew(cell.date),
+      },
+    },
+    el('div', { class: 'day-num' }, String(cell.date.getDate())),
+    el('div', { class: 'day-marks' },
+      types.map(t => el('div', { class: 'day-mark ' + t }))));
+};
+
+const DayList = (date, items) =>
+  el('div', { class: 'day-list' },
+    el('div', { class: 'day-list-header' },
+      el('strong', {}, dateLabel(date)),
+      el('span', {}, items.length === 0 ? 'No items' : `${items.length} item${items.length === 1 ? '' : 's'}`)),
+    items.length === 0
+      ? el('div', { class: 'empty-state' }, 'Tap + or long-press the day to add')
+      : items.map(ItemRow));
+
+const ItemRow = (item) =>
+  el('div', { class: 'item-row' + (item.completed ? ' done' : ''),
+    gesture: {
+      onTap:       () => Actions.openEdit(item.id),
+      onLongPress: ev => openContextMenu(ev, item),
+    }},
+    el('div', { class: 'item-bar ' + item.type }),
+    el('div', { class: 'item-time' + (item.time ? '' : ' allday') },
+      item.time ? fmtTimeShort(item.time) : 'all-day'),
+    el('div', { class: 'item-body' },
+      el('div', { class: 'item-content' }, item.content)),
+    item.type === 'todo' && el('div', {
+      class: 'item-checkbox' + (item.completed ? ' on' : ''),
+      onClick: e => { e.stopPropagation(); toggleDone(item); },
+    }));
+
+const DayViewStub = () =>
+  el('div', { class: 'empty-state', style: { padding: '60px 20px' } },
+    'Day view — coming in Session 2');
+
+const ListViewStub = () =>
+  el('div', { class: 'empty-state', style: { padding: '60px 20px' } },
+    'List view — coming in Session 2');
+
+const openContextMenu = (ev, item) => {
+  // Stub: just toast for now. Session 2 builds the dynamic context menu.
+  Actions.toast(`Long-pressed: ${item.content || '(empty)'}`);
+};
+
+const toggleDone = async (item) => {
+  if (item.type !== 'todo') return;
+  const updated = { ...item, completed: !item.completed };
+  Actions.upsertItem(updated);
+  try { await Sync.push(updated); }
+  catch (e) { Actions.toast('Could not save'); Actions.upsertItem(item); }
+};
+
+
+/* ─── HELPERS for components ─── */
+
+/* All items occurring on a given date (uses Map). */
+const itemsOnDate = (date) => {
+  const key = ds(date);
+  const out = [];
+  for (const it of state.items.values()) if (it.date === key) out.push(it);
+  return out;
+};
+
+/* Sort items: timed first (by time), then untimed, then events > todos > notes. */
+const sortByTime = (items) => {
+  const order = { event: 0, todo: 1, note: 2 };
+  return [...items].sort((a, b) => {
+    if (a.time && b.time) return a.time.localeCompare(b.time);
+    if (a.time) return -1;
+    if (b.time) return 1;
+    return (order[a.type] ?? 3) - (order[b.type] ?? 3);
+  });
+};
+
+const uniq = (arr) => [...new Set(arr)];
+
+/* 6×7 month grid cells anchored on the month containing `date`.
+   Returns 42 entries with { date, month } so we know which cells are out-of-month. */
+const monthCells = (date) => {
+  const first = startOfMonth(date);
+  const start = addDays(first, -first.getDay());  // back to the previous Sunday
+  return Array.from({ length: 42 }, (_, i) => {
+    const d = addDays(start, i);
+    return { date: d, month: d.getMonth() };
+  });
+};
+
+const dateLabel = (d) => {
+  if (sameDay(d, today())) return 'Today';
+  if (sameDay(d, addDays(today(), 1)))  return 'Tomorrow';
+  if (sameDay(d, addDays(today(), -1))) return 'Yesterday';
+  return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`;
+};
+
+
+/* ─── 11. BOOT ──────────────────────────────────────────────────────────── */
+
+(function init() {
+  // Apply theme immediately (before anything paints).
+  document.documentElement.classList.toggle('dark', state.dark);
+  document.documentElement.classList.toggle('light', !state.dark);
+
+  // Show cached items instantly while we do background auth.
+  Sync.restoreCache();
+
+  // First render — splash screen.
+  renderApp();
+
+  // Auth: if we have a stored sheetId (proof of prior auth), try silent;
+  // otherwise show sign-in screen.
+  if (state.sheetId) {
+    Auth.whenGIS(async () => {
+      const ok = await Auth.silentRefresh();
+      if (ok) {
+        // Show cached UI immediately, then sync in background
+        if (state.items.size > 0) Actions.setStatus('ready');
+        try { await Sync.load(); Auth.fetchUser(); Actions.setStatus('ready'); }
+        catch (e) { Actions.toast('Sync failed: ' + e.message); }
+      } else {
+        Actions.setStatus('auth');
+      }
+    });
+  } else {
+    Auth.whenGIS(() => Actions.setStatus('auth'));
+  }
+})();
+
+</script>
+</body>
+</html>
