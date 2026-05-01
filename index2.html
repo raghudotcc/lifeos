@@ -17,20 +17,16 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Surfaces (Apple light system) */
   --bg-1: #FFFFFF;
   --bg-2: #F2F2F7;
   --bg-3: #E5E5EA;
   --bg-4: #D1D1D6;
-  /* Labels */
   --t-1: #000000;
   --t-2: rgba(60,60,67,.60);
   --t-3: rgba(60,60,67,.30);
   --t-4: rgba(60,60,67,.18);
-  /* Separators */
   --sep:    rgba(60,60,67,.29);
   --sep-th: rgba(60,60,67,.12);
-  /* Apple system colors */
   --blue:   #007AFF;
   --green:  #34C759;
   --indigo: #5856D6;
@@ -41,20 +37,15 @@
   --teal:   #5AC8FA;
   --yellow: #FFCC00;
   --gray:   #8E8E93;
-  /* Per-item-type accent (semantic) */
   --c-note:  var(--orange);
   --c-todo:  var(--blue);
   --c-event: var(--purple);
   --c-done:  var(--green);
-  /* Spacing — 4pt grid */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
   --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
-  /* Radii */
   --r-1: 6px; --r-2: 10px; --r-3: 14px; --r-4: 20px;
-  /* Heights */
   --topbar-h: 44px;
   --tabbar-h: 50px;
-  /* Safe area */
   --safe-t: env(safe-area-inset-top, 0px);
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-l: env(safe-area-inset-left, 0px);
@@ -95,10 +86,8 @@ html, body { height: 100%; height: 100dvh; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
-  font-size: 17px;
-  line-height: 1.35;
-  color: var(--t-1);
-  background: var(--bg-1);
+  font-size: 17px; line-height: 1.35;
+  color: var(--t-1); background: var(--bg-1);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
@@ -110,17 +99,11 @@ button, input, textarea, select {
   font: inherit; color: inherit; background: none; border: none; outline: none;
   -webkit-appearance: none; appearance: none;
 }
-
 button { cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
-
 a { color: var(--blue); text-decoration: none; }
-
 ::selection { background: rgba(10,132,255,.25); }
-
-/* Scrollbar — minimal */
 ::-webkit-scrollbar { width: 0; height: 0; }
 
-/* Type scale */
 .t-large    { font-size: 34px; line-height: 1.15; font-weight: 700; letter-spacing: -.4px; }
 .t-title    { font-size: 22px; line-height: 1.25; font-weight: 700; letter-spacing: -.2px; }
 .t-headline { font-size: 17px; line-height: 1.3;  font-weight: 600; }
@@ -139,19 +122,16 @@ a { color: var(--blue); text-decoration: none; }
   display: flex; flex-direction: column;
   height: 100dvh; width: 100%;
   background: var(--bg-1);
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   TOP BAR — Apple navigation bar
+   TOP BAR
    ───────────────────────────────────────────────────────────────────────────── */
 
 .topbar {
   flex-shrink: 0;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   height: calc(var(--topbar-h) + var(--safe-t));
   padding: var(--safe-t) max(var(--s-4), var(--safe-r)) 0 max(var(--s-4), var(--safe-l));
   background: rgba(255,255,255,.85);
@@ -166,22 +146,15 @@ html.dark .topbar { background: rgba(0,0,0,.75); }
 .topbar-left { justify-self: start; }
 .topbar-right { justify-self: end; }
 .topbar-title {
-  font-size: 17px; font-weight: 600;
-  color: var(--t-1);
+  font-size: 17px; font-weight: 600; color: var(--t-1);
   cursor: pointer; user-select: none;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  text-align: center;
-  padding: var(--s-1) var(--s-2);
+  text-align: center; padding: var(--s-1) var(--s-2);
 }
 
-.btn-back {
-  display: inline-flex; align-items: center; gap: 2px;
-  color: var(--blue); font-size: 17px; font-weight: 400;
-  padding: var(--s-2) 0;
-}
+.btn-back { display: inline-flex; align-items: center; gap: 2px; color: var(--blue); font-size: 17px; padding: var(--s-2) 0; }
 .btn-back svg { width: 18px; height: 18px; }
-
-.btn-text { color: var(--blue); font-size: 17px; font-weight: 400; padding: var(--s-2); }
+.btn-text { color: var(--blue); font-size: 17px; padding: var(--s-2); }
 .btn-text-strong { color: var(--blue); font-size: 17px; font-weight: 600; padding: var(--s-2); }
 .btn-icon {
   width: 32px; height: 32px; border-radius: 50%;
@@ -191,26 +164,12 @@ html.dark .topbar { background: rgba(0,0,0,.75); }
 .btn-icon:active { background: var(--bg-3); }
 .btn-icon svg { width: 22px; height: 22px; }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   CONTENT REGION
-   ───────────────────────────────────────────────────────────────────────────── */
+/* Content & tabs */
 
-.content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   TAB BAR — Apple bottom tab bar
-   ───────────────────────────────────────────────────────────────────────────── */
+.content { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
 .tabbar {
-  flex-shrink: 0;
-  display: flex;
+  flex-shrink: 0; display: flex;
   height: calc(var(--tabbar-h) + var(--safe-b));
   padding-bottom: var(--safe-b);
   background: rgba(255,255,255,.85);
@@ -222,26 +181,19 @@ html.dark .topbar { background: rgba(0,0,0,.75); }
 html.dark .tabbar { background: rgba(0,0,0,.75); }
 
 .tab {
-  flex: 1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px;
-  color: var(--t-2);
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; color: var(--t-2);
   font-size: 10px; font-weight: 500; letter-spacing: .1px;
   transition: color .1s;
 }
 .tab.on { color: var(--blue); }
 .tab svg { width: 24px; height: 24px; }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   AUTH SCREEN
-   ───────────────────────────────────────────────────────────────────────────── */
+/* Auth + splash */
 
 .auth {
-  flex: 1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: var(--s-6) var(--s-5);
-  gap: var(--s-5);
-  background: var(--bg-1);
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: var(--s-6) var(--s-5); gap: var(--s-5); background: var(--bg-1);
 }
 .auth-logo {
   width: 80px; height: 80px; border-radius: 18px;
@@ -254,178 +206,116 @@ html.dark .tabbar { background: rgba(0,0,0,.75); }
 .auth-sub { color: var(--t-2); text-align: center; font-size: 16px; max-width: 280px; }
 .auth-btn {
   display: inline-flex; align-items: center; gap: var(--s-3);
-  padding: 12px 22px;
-  background: var(--t-1); color: var(--bg-1);
-  border-radius: 12px;
-  font-size: 16px; font-weight: 600;
-  transition: opacity .12s;
+  padding: 12px 22px; background: var(--t-1); color: var(--bg-1);
+  border-radius: 12px; font-size: 16px; font-weight: 600; transition: opacity .12s;
 }
 .auth-btn:active { opacity: .7; }
-.auth-btn svg { width: 18px; height: 18px; }
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SPLASH (initial loading)
-   ───────────────────────────────────────────────────────────────────────────── */
 
 .splash {
-  position: fixed; inset: 0; z-index: 1000;
-  background: var(--bg-1);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: var(--s-4);
+  position: fixed; inset: 0; z-index: 1000; background: var(--bg-1);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s-4);
 }
 .splash-spin {
   width: 24px; height: 24px;
   border: 2.5px solid var(--bg-3); border-top-color: var(--blue);
-  border-radius: 50%;
-  animation: spin .8s linear infinite;
+  border-radius: 50%; animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .splash-msg { color: var(--t-2); font-size: 14px; }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   COMMON COMPONENTS — buttons, inputs, sheets
-   ───────────────────────────────────────────────────────────────────────────── */
-
-.btn-pill {
-  display: inline-flex; align-items: center; gap: var(--s-2);
-  padding: var(--s-1) var(--s-3);
-  background: rgba(120,120,128,.16);
-  border-radius: 100px;
-  color: var(--blue); font-weight: 500; font-size: 15px;
-}
+/* Inputs */
 
 .input {
-  width: 100%;
-  background: var(--bg-2);
-  border-radius: var(--r-2);
-  padding: 11px 14px;
-  font-size: 17px;
-  color: var(--t-1);
-  border: 1px solid transparent;
-  transition: border-color .15s;
+  width: 100%; background: var(--bg-2); border-radius: var(--r-2);
+  padding: 11px 14px; font-size: 17px; color: var(--t-1);
+  border: 1px solid transparent; transition: border-color .15s;
 }
 .input:focus { border-color: var(--blue); }
 .input::placeholder { color: var(--t-3); }
-
 textarea.input { resize: none; min-height: 88px; line-height: 1.45; }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   TOAST
-   ───────────────────────────────────────────────────────────────────────────── */
+/* Toast */
 
 .toast {
-  position: fixed;
-  bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--s-4));
+  position: fixed; bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--s-4));
   left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--bg-3); color: var(--t-1);
   padding: 10px 16px; border-radius: 100px;
   font-size: 14px; font-weight: 500;
-  box-shadow: 0 6px 24px rgba(0,0,0,.3);
-  border: 0.5px solid var(--sep-th);
+  box-shadow: 0 6px 24px rgba(0,0,0,.3); border: 0.5px solid var(--sep-th);
   pointer-events: none; opacity: 0;
   transition: all .25s cubic-bezier(.4,0,.2,1);
-  z-index: 9999;
-  white-space: nowrap; max-width: 90vw;
+  z-index: 9999; white-space: nowrap; max-width: 90vw;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   MONTH VIEW (skeleton — full implementation in Session 2)
+   MONTH VIEW
    ───────────────────────────────────────────────────────────────────────────── */
 
-.month {
-  display: flex; flex-direction: column;
-  height: 100%;
-  background: var(--bg-1);
-}
+.month { display: flex; flex-direction: column; height: 100%; background: var(--bg-1); }
 
 .month-dow {
   display: grid; grid-template-columns: repeat(7,1fr);
-  padding: 0 var(--s-2);
-  border-bottom: 0.5px solid var(--sep-th);
-  flex-shrink: 0;
+  padding: 0 var(--s-2); border-bottom: 0.5px solid var(--sep-th); flex-shrink: 0;
 }
 .month-dow > div {
-  text-align: center;
-  padding: 6px 0;
-  font-size: 11px; font-weight: 600;
-  color: var(--t-2); letter-spacing: .5px;
-  text-transform: uppercase;
+  text-align: center; padding: 6px 0;
+  font-size: 11px; font-weight: 600; color: var(--t-2);
+  letter-spacing: .5px; text-transform: uppercase;
 }
 .month-dow > div.weekend { color: var(--t-3); }
 
 .month-grid {
   display: grid; grid-template-columns: repeat(7,1fr); grid-auto-rows: 1fr;
-  flex-shrink: 0;
-  border-bottom: 0.5px solid var(--sep);
+  flex-shrink: 0; border-bottom: 0.5px solid var(--sep);
 }
 
 .day-cell {
-  position: relative;
-  padding: var(--s-1) var(--s-1) 0;
+  position: relative; padding: var(--s-1) var(--s-1) 0;
   display: flex; flex-direction: column; align-items: center;
-  min-height: 56px;
-  border-top: 0.5px solid var(--sep-th);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  min-height: 56px; border-top: 0.5px solid var(--sep-th);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 .day-cell.other-month .day-num { color: var(--t-3); }
 .day-num {
-  font-size: 17px; font-weight: 400;
-  color: var(--t-1);
+  font-size: 17px; font-weight: 400; color: var(--t-1);
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  margin-top: 2px;
+  border-radius: 50%; margin-top: 2px;
 }
-.day-cell.today .day-num {
-  background: var(--red); color: white;
-  font-weight: 600;
-}
-.day-cell.selected .day-num {
-  background: var(--t-1); color: var(--bg-1);
-  font-weight: 600;
-}
+.day-cell.today .day-num { background: var(--red); color: white; font-weight: 600; }
+.day-cell.selected .day-num { background: var(--t-1); color: var(--bg-1); font-weight: 600; }
 .day-cell.today.selected .day-num { background: var(--red); }
 
-.day-marks {
-  display: flex; gap: 2px; margin-top: 3px;
-  min-height: 4px;
-}
+.day-marks { display: flex; gap: 2px; margin-top: 3px; min-height: 4px; }
 .day-mark { width: 4px; height: 4px; border-radius: 50%; }
 .day-mark.note  { background: var(--c-note); }
 .day-mark.todo  { background: var(--c-todo); }
 .day-mark.event { background: var(--c-event); }
+.day-mark.done  { background: var(--c-done); opacity: .5; }
 
-/* Day list below the month grid */
 .day-list {
   flex: 1; min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: var(--s-3) 0 var(--s-6);
+  overflow-y: scroll; -webkit-overflow-scrolling: touch;
+  padding: 0 0 var(--s-6);
+  touch-action: pan-y;
 }
 .day-list-header {
-  padding: var(--s-3) var(--s-4) var(--s-2);
-  font-size: 14px; font-weight: 600;
-  color: var(--t-2);
-  text-transform: uppercase; letter-spacing: .5px;
+  padding: var(--s-4) var(--s-4) var(--s-2);
+  font-size: 14px; font-weight: 500; color: var(--t-2);
 }
-.day-list-header strong { color: var(--t-1); font-weight: 700; text-transform: none; letter-spacing: 0; font-size: 17px; display: block; margin-bottom: 2px; }
+.day-list-header strong { color: var(--t-1); font-weight: 700; font-size: 17px; display: block; margin-bottom: 2px; letter-spacing: -.2px; }
 
-.empty-state {
-  padding: var(--s-7) var(--s-5);
-  text-align: center;
-  color: var(--t-3);
-  font-size: 15px;
-}
+.empty-state { padding: var(--s-7) var(--s-5); text-align: center; color: var(--t-3); font-size: 15px; }
 
 /* Item row */
+
 .item-row {
   display: flex; align-items: flex-start; gap: var(--s-3);
-  padding: 11px var(--s-4);
-  cursor: default;
-  position: relative;
-  transition: background .08s;
+  padding: 11px var(--s-4); cursor: default;
+  position: relative; transition: background .08s;
+  -webkit-tap-highlight-color: transparent;
 }
 .item-row + .item-row::before {
   content: ''; position: absolute; left: 56px; right: 0; top: 0;
@@ -434,12 +324,7 @@ textarea.input { resize: none; min-height: 88px; line-height: 1.45; }
 .item-row:active { background: var(--bg-2); }
 .item-row.done .item-content { color: var(--t-3); text-decoration: line-through; }
 
-.item-bar {
-  width: 4px; flex-shrink: 0;
-  align-self: stretch; min-height: 22px;
-  border-radius: 2px;
-  margin-top: 2px;
-}
+.item-bar { width: 4px; flex-shrink: 0; align-self: stretch; min-height: 22px; border-radius: 2px; margin-top: 2px; }
 .item-bar.note  { background: var(--c-note); }
 .item-bar.todo  { background: var(--c-todo); }
 .item-bar.event { background: var(--c-event); }
@@ -447,43 +332,527 @@ textarea.input { resize: none; min-height: 88px; line-height: 1.45; }
 .item-time {
   flex-shrink: 0; min-width: 56px;
   font-size: 13px; color: var(--t-2);
-  margin-top: 2px;
-  font-variant-numeric: tabular-nums;
+  margin-top: 2px; font-variant-numeric: tabular-nums;
 }
-.item-time.allday { color: var(--t-3); font-style: italic; }
+.item-time.allday { color: var(--t-3); }
 
 .item-body { flex: 1; min-width: 0; }
 .item-content { font-size: 16px; line-height: 1.3; color: var(--t-1); word-break: break-word; }
-.item-meta { display: flex; gap: var(--s-2); margin-top: 2px; align-items: center; }
 
 .item-checkbox {
   width: 22px; height: 22px; flex-shrink: 0;
-  border-radius: 50%;
-  border: 1.5px solid var(--t-3);
+  border-radius: 50%; border: 1.5px solid var(--t-3);
   display: inline-flex; align-items: center; justify-content: center;
-  margin-top: 1px;
-  transition: all .15s;
+  margin-top: 1px; transition: all .15s;
 }
 .item-checkbox.on { background: var(--green); border-color: var(--green); color: white; }
 .item-checkbox.on::after { content: '✓'; font-size: 13px; font-weight: 700; }
+
+.item-attachments { display: flex; gap: var(--s-2); margin-top: var(--s-2); flex-wrap: wrap; }
+.item-thumb { width: 64px; height: 64px; border-radius: var(--r-1); object-fit: cover; cursor: pointer; }
+.item-rem-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 100px;
+  background: rgba(120,120,128,.16); font-size: 12px; color: var(--t-2);
+  margin-top: var(--s-1);
+}
+
+/* Markdown content */
+.md-h1, .md-h2, .md-h3 { display: block; font-weight: 700; }
+.md-h1 { font-size: 1.1em; }
+.md-h2 { font-size: 1em; }
+.md-h3 { font-size: .95em; font-weight: 600; }
+.md-li { display: block; padding-left: 1em; text-indent: -1em; }
+.md-q  { display: block; border-left: 3px solid var(--t-3); padding-left: 8px; color: var(--t-2); margin: 2px 0; }
+.md-br { display: block; height: .5em; }
+.md-code { font-family: 'SF Mono','Menlo','Cascadia Code',monospace; background: var(--bg-3); padding: 1px 5px; border-radius: 4px; font-size: .88em; }
+.md-link { color: var(--blue); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DAY VIEW (timeline + segmented control)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.day-view { display: flex; flex-direction: column; height: 100%; background: var(--bg-1); }
+
+.seg-bar {
+  flex-shrink: 0;
+  padding: var(--s-2) var(--s-4);
+  background: var(--bg-1);
+  border-bottom: 0.5px solid var(--sep-th);
+}
+.seg-ctl {
+  display: flex; gap: 2px;
+  background: var(--bg-3); padding: 2px;
+  border-radius: var(--r-1);
+}
+.seg {
+  flex: 1; padding: 6px 10px;
+  font-size: 13px; font-weight: 500;
+  color: var(--t-1); border-radius: 5px;
+  background: transparent; transition: all .15s;
+}
+.seg.on {
+  background: var(--bg-1); font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 1px rgba(0,0,0,.06);
+}
+html.dark .seg.on { background: var(--bg-4); }
+
+.timeline {
+  flex: 1; min-height: 0;
+  overflow-y: scroll; -webkit-overflow-scrolling: touch;
+  position: relative;
+  touch-action: pan-y;
+}
+.timeline-inner { position: relative; height: calc(24 * 60px); }
+
+.hour-row {
+  position: absolute; left: 0; right: 0; height: 60px;
+  display: flex; align-items: flex-start;
+  cursor: pointer;
+}
+.hour-row:hover { background: rgba(120,120,128,.05); }
+.hour-lbl {
+  width: 56px; flex-shrink: 0; padding-right: var(--s-3);
+  text-align: right;
+  font-size: 11px; color: var(--t-3);
+  margin-top: -7px; user-select: none;
+}
+.hour-line { flex: 1; height: 1px; background: var(--sep-th); margin-top: 0; align-self: flex-start; }
+
+.timeline-events {
+  position: absolute; top: 0; left: 56px; right: 8px; bottom: 0;
+  pointer-events: none;
+}
+.tl-event {
+  position: absolute; pointer-events: all;
+  border-radius: var(--r-1);
+  padding: 4px 8px;
+  font-size: 12px; line-height: 1.3;
+  border-left: 3px solid;
+  overflow: hidden; cursor: pointer;
+  background: var(--bg-2);
+}
+.tl-event.note  { border-left-color: var(--c-note);  background: rgba(255,149,0,.12); color: var(--c-note); }
+.tl-event.todo  { border-left-color: var(--c-todo);  background: rgba(0,122,255,.12); color: var(--c-todo); }
+.tl-event.event { border-left-color: var(--c-event); background: rgba(175,82,222,.12); color: var(--c-event); }
+html.dark .tl-event.note  { background: rgba(255,159,10,.18); }
+html.dark .tl-event.todo  { background: rgba(10,132,255,.18); }
+html.dark .tl-event.event { background: rgba(191,90,242,.18); }
+.tl-event.done { opacity: .35; }
+.tl-event-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-event-time { font-size: 10px; opacity: .7; margin-top: 2px; }
+
+.now-line {
+  position: absolute; left: 50px; right: 0; height: 2px;
+  background: var(--red); pointer-events: none; z-index: 5;
+}
+.now-dot {
+  position: absolute; left: -5px; top: -4px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--red);
+}
+
+/* All-day strip on timeline */
+.tl-allday {
+  border-bottom: 0.5px solid var(--sep);
+  padding: var(--s-2) var(--s-4) var(--s-2) 60px;
+  display: flex; flex-wrap: wrap; gap: var(--s-1);
+  flex-shrink: 0; min-height: 36px;
+  background: var(--bg-1);
+}
+.tl-allday-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 100px;
+  font-size: 12px; cursor: pointer;
+  background: var(--bg-2);
+}
+.tl-allday-pill.note  { color: var(--c-note); }
+.tl-allday-pill.todo  { color: var(--c-todo); }
+.tl-allday-pill.event { color: var(--c-event); }
+.tl-allday-pill::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+
+/* Multi-day timeline (week-style) */
+.multi { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.multi-hdr {
+  display: grid; grid-template-columns: 56px repeat(7, 1fr);
+  border-bottom: 0.5px solid var(--sep); flex-shrink: 0;
+  background: var(--bg-1);
+}
+.multi-hdr > .empty { }
+.multi-day-hdr {
+  text-align: center; padding: 8px 0;
+  font-size: 11px; color: var(--t-2);
+  border-left: 0.5px solid var(--sep-th);
+  cursor: pointer;
+}
+.multi-day-hdr.today .multi-day-num { background: var(--red); color: white; font-weight: 600; }
+.multi-day-hdr.selected .multi-day-num { background: var(--t-1); color: var(--bg-1); font-weight: 600; }
+.multi-day-hdr.today.selected .multi-day-num { background: var(--red); }
+.multi-day-name { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
+.multi-day-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  font-size: 15px; margin-top: 2px;
+}
+.multi-body { flex: 1; min-height: 0; overflow-y: scroll; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.multi-cols { position: relative; height: calc(24 * 60px); display: grid; grid-template-columns: 56px repeat(7, 1fr); }
+.multi-col { position: relative; border-left: 0.5px solid var(--sep-th); }
+.multi-col-events { position: absolute; inset: 0; pointer-events: none; }
+.multi-col-events .tl-event { padding: 2px 4px; font-size: 10px; }
+.multi-times { position: relative; }
+.multi-times .hour-lbl {
+  position: absolute; right: 8px; width: auto;
+  font-size: 10px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIST VIEW
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.list-view { display: flex; flex-direction: column; height: 100%; background: var(--bg-1); }
+.list-filters {
+  display: flex; gap: var(--s-2); padding: var(--s-3) var(--s-4);
+  overflow-x: auto; scrollbar-width: none;
+  border-bottom: 0.5px solid var(--sep-th); flex-shrink: 0;
+}
+.list-filters::-webkit-scrollbar { display: none; }
+.fc {
+  padding: 5px 12px; border-radius: 100px;
+  font-size: 14px; color: var(--blue);
+  background: rgba(10,132,255,.1);
+  white-space: nowrap;
+}
+.fc.on { background: var(--blue); color: white; }
+.list-body {
+  flex: 1; min-height: 0; overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--s-6);
+  touch-action: pan-y;
+}
+.list-section-hdr {
+  padding: var(--s-4) var(--s-4) 4px;
+  font-size: 13px; font-weight: 600; color: var(--t-2);
+  text-transform: uppercase; letter-spacing: .5px;
+  background: var(--bg-1); position: sticky; top: 0;
+}
+.list-section-hdr.today { color: var(--blue); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MODAL — Apple-style sheet
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.backdrop {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(2px);
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: fadein .15s ease-out;
+}
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 600px) { .backdrop { align-items: center; } }
+
+.sheet {
+  position: relative;
+  width: 100%; max-width: 520px;
+  background: var(--bg-1);
+  border-radius: 14px 14px 0 0;
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 60px);
+  max-height: calc(100dvh - 60px);
+  padding-bottom: var(--safe-b);
+  animation: slideup .25s cubic-bezier(.32,.72,0,1);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.4);
+}
+@keyframes slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@media (min-width: 600px) { .sheet { border-radius: 14px; animation: pop .2s ease-out; } }
+@keyframes pop { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.sheet-hdr {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; padding: var(--s-3) var(--s-4);
+  border-bottom: 0.5px solid var(--sep);
+  flex-shrink: 0;
+}
+.sheet-title { font-size: 17px; font-weight: 600; text-align: center; }
+.sheet-cancel { color: var(--blue); font-size: 17px; padding: var(--s-2); justify-self: start; }
+.sheet-save { color: var(--blue); font-size: 17px; font-weight: 600; padding: var(--s-2); justify-self: end; }
+.sheet-save:disabled { opacity: .4; }
+
+.sheet-body {
+  flex: 1; overflow-y: auto;
+  padding: var(--s-4); display: flex; flex-direction: column; gap: var(--s-3);
+  -webkit-overflow-scrolling: touch;
+}
+
+.type-select { display: flex; gap: var(--s-2); }
+.type-opt {
+  flex: 1; padding: 10px; border-radius: var(--r-1);
+  border: 1.5px solid transparent;
+  background: var(--bg-2);
+  font-size: 14px; font-weight: 500; color: var(--t-2);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.type-opt-ic { font-size: 20px; }
+.type-opt.on.note  { background: rgba(255,149,0,.15);  color: var(--c-note);  border-color: var(--c-note); }
+.type-opt.on.todo  { background: rgba(0,122,255,.15);  color: var(--c-todo);  border-color: var(--c-todo); }
+.type-opt.on.event { background: rgba(175,82,222,.15); color: var(--c-event); border-color: var(--c-event); }
+
+.field-group {
+  background: var(--bg-2); border-radius: var(--r-2);
+  overflow: hidden;
+}
+.field-row {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: 10px var(--s-3);
+  font-size: 16px;
+}
+.field-row + .field-row { border-top: 0.5px solid var(--sep-th); }
+.field-label { color: var(--t-1); flex: 1; }
+.field-value { color: var(--t-2); }
+.field-row input[type="date"], .field-row input[type="time"] {
+  background: transparent; color: var(--t-1); padding: 4px;
+  font-size: 16px; text-align: right;
+}
+.field-row input[type="date"]::-webkit-calendar-picker-indicator,
+.field-row input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(.5);
+}
+html.dark .field-row input[type="date"]::-webkit-calendar-picker-indicator,
+html.dark .field-row input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(.7);
+}
+
+.toggle {
+  width: 51px; height: 31px; border-radius: 16px;
+  background: var(--bg-3); position: relative;
+  transition: background .2s;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 27px; height: 27px; border-radius: 50%;
+  background: white; transition: left .2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,.2);
+}
+.toggle.on::after { left: 22px; }
+
+.attach-row {
+  display: flex; gap: var(--s-2);
+  padding: var(--s-3) var(--s-3);
+}
+.attach-btn {
+  flex: 1; padding: 10px;
+  background: var(--bg-2); border-radius: var(--r-1);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--t-2);
+}
+.attach-btn svg { width: 22px; height: 22px; color: var(--blue); }
+
+.attach-preview {
+  display: flex; gap: var(--s-2); padding: var(--s-2) var(--s-3);
+  flex-wrap: wrap;
+}
+.attach-thumb {
+  width: 80px; height: 80px;
+  border-radius: var(--r-1);
+  object-fit: cover;
+  border: 1px solid var(--sep);
+  cursor: pointer;
+  position: relative;
+}
+.attach-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; background: var(--bg-3);
+  border-radius: 100px; font-size: 13px;
+}
+.attach-x {
+  background: var(--bg-3); border-radius: 50%;
+  width: 18px; height: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--t-2);
+  cursor: pointer;
+}
+
+.delete-btn {
+  margin: var(--s-3); padding: 12px;
+  text-align: center; color: var(--red);
+  background: var(--bg-2); border-radius: var(--r-2);
+  font-size: 17px; font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CONTEXT MENU
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.ctx-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: transparent;
+}
+.ctx-menu {
+  position: fixed; z-index: 201;
+  background: var(--bg-2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--r-2);
+  min-width: 220px; max-width: 280px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 0 0.5px var(--sep-th);
+  overflow: hidden;
+  animation: pop .15s cubic-bezier(.32,.72,0,1);
+}
+html.dark .ctx-menu { background: rgba(50,50,52,.95); }
+
+.ctx-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px var(--s-4);
+  font-size: 16px; color: var(--t-1);
+  cursor: pointer;
+}
+.ctx-item:active { background: rgba(120,120,128,.16); }
+.ctx-item + .ctx-item { border-top: 0.5px solid var(--sep-th); }
+.ctx-item.danger { color: var(--red); }
+.ctx-item-icon { color: var(--t-2); font-size: 18px; }
+.ctx-item.danger .ctx-item-icon { color: var(--red); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMMAND PALETTE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.cmd-backdrop {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,.4);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 12vh var(--s-4) var(--s-4);
+  animation: fadein .12s;
+}
+.cmd-palette {
+  width: 100%; max-width: 540px;
+  background: var(--bg-2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--r-3);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  max-height: 70vh;
+  animation: pop .15s cubic-bezier(.32,.72,0,1);
+}
+.cmd-input {
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 0.5px solid var(--sep);
+  display: flex; align-items: center; gap: var(--s-3);
+}
+.cmd-input svg { width: 20px; height: 20px; color: var(--t-3); }
+.cmd-input input {
+  flex: 1; font-size: 17px; color: var(--t-1);
+  background: transparent; border: none; outline: none;
+}
+.cmd-input input::placeholder { color: var(--t-3); }
+.cmd-results {
+  flex: 1; min-height: 0; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.cmd-section {
+  padding: var(--s-2) var(--s-4) 4px;
+  font-size: 11px; font-weight: 600; color: var(--t-2);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.cmd-row {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: 9px var(--s-4);
+  cursor: pointer; font-size: 15px;
+}
+.cmd-row.focused, .cmd-row:hover { background: rgba(10,132,255,.12); }
+.cmd-row-ic {
+  width: 28px; height: 28px; border-radius: var(--r-1);
+  background: var(--bg-3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--t-1); flex-shrink: 0;
+}
+.cmd-row-ic.note  { background: rgba(255,149,0,.2);  color: var(--c-note); }
+.cmd-row-ic.todo  { background: rgba(0,122,255,.2);  color: var(--c-todo); }
+.cmd-row-ic.event { background: rgba(175,82,222,.2); color: var(--c-event); }
+.cmd-row-ic.date  { background: rgba(48,209,88,.2);  color: var(--green); }
+.cmd-row-body { flex: 1; min-width: 0; }
+.cmd-row-title { color: var(--t-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmd-row-sub { color: var(--t-2); font-size: 12px; margin-top: 1px; }
+.cmd-empty { padding: var(--s-6) var(--s-4); text-align: center; color: var(--t-3); font-size: 14px; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SETTINGS PANEL
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.settings-panel {
+  position: relative;
+  background: var(--bg-1);
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column;
+  border-radius: 14px 14px 0 0;
+  max-height: 88vh; max-height: 88dvh;
+  padding-bottom: var(--safe-b);
+  animation: slideup .25s cubic-bezier(.32,.72,0,1);
+}
+@media (min-width: 600px) { .settings-panel { border-radius: 14px; } }
+
+.settings-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 0.5px solid var(--sep);
+}
+.settings-body {
+  overflow-y: auto;
+  padding: var(--s-4);
+  display: flex; flex-direction: column; gap: var(--s-4);
+}
+
+.settings-profile {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-4); background: var(--bg-2); border-radius: var(--r-2);
+}
+.settings-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--bg-3); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--blue); font-weight: 600;
+}
+.settings-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.settings-name { font-size: 17px; font-weight: 600; }
+.settings-email { font-size: 13px; color: var(--t-2); }
+
+.settings-list { background: var(--bg-2); border-radius: var(--r-2); overflow: hidden; }
+.settings-item {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: 12px var(--s-4);
+  font-size: 16px;
+  cursor: pointer;
+}
+.settings-item:active { background: var(--bg-3); }
+.settings-item + .settings-item { border-top: 0.5px solid var(--sep-th); }
+.settings-item-arrow { color: var(--t-3); margin-left: auto; }
+.settings-item.danger { color: var(--red); }
+
 </style>
 </head>
 <body>
 
 <div id="root">
-  <div class="splash">
-    <div class="splash-spin"></div>
-    <div class="splash-msg">Loading…</div>
-  </div>
+  <div class="splash"><div class="splash-spin"></div><div class="splash-msg">Loading…</div></div>
 </div>
+<div id="modalRoot"></div>
+<div id="ctxRoot"></div>
+<div id="cmdRoot"></div>
+<div id="settingsRoot"></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 'use strict';
 
 /* ═════════════════════════════════════════════════════════════════════════════
-   LIFEOS — clean rebuild
-   Single file. Sections in order:
+   LIFEOS — Sessions 1 & 2 combined.
+   Single file, organized as discrete modules:
+
      1. UTILS         — pure helpers, DOM builder
      2. CONFIG        — constants, schema
      3. STATE         — single tree, update fn, subscribe
@@ -492,9 +861,13 @@ textarea.input { resize: none; min-height: 88px; line-height: 1.45; }
      6. AUTH          — Google OAuth flow
      7. GESTURES      — single pointer-event dispatcher
      8. DATE PARSER   — natural language → Date
-     9. RENDER        — root render, slot caching
-    10. COMPONENTS    — TopBar, MonthView, DayView (stubs in S1)
-    11. BOOT          — bootstrap
+     9. MARKDOWN      — minimal renderer
+    10. ATTACHMENTS   — image capture / Drive upload
+    11. REMINDERS     — schedule + notify
+    12. RENDER        — slot-based, signature-keyed re-renders
+    13. COMPONENTS    — TopBar, Month, Day (with mode), List, Modal,
+                       ContextMenu, CommandPalette, Settings
+    14. BOOT          — bootstrap
    ═════════════════════════════════════════════════════════════════════════════ */
 
 
@@ -510,7 +883,6 @@ const addMos  = (d, n) => new Date(d.getFullYear(), d.getMonth()+n, 1);
 const sameDay = (a, b) => ds(a) === ds(b);
 const wkStart = d => addDays(d, -d.getDay());
 const startOfMonth = d => new Date(d.getFullYear(), d.getMonth(), 1);
-const endOfMonth   = d => new Date(d.getFullYear(), d.getMonth()+1, 0);
 
 const uid  = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 const bool = x => x ? 'TRUE' : 'FALSE';
@@ -521,27 +893,21 @@ const fmtTime = t => {
   const [h,m] = t.split(':').map(Number);
   return `${h%12 || 12}:${p2(m)} ${h>=12 ? 'PM' : 'AM'}`;
 };
-
 const fmtTimeShort = t => {
   if (!t) return '';
   const [h,m] = t.split(':').map(Number);
   const ap = h>=12 ? 'PM' : 'AM';
   return m === 0 ? `${h%12||12} ${ap}` : `${h%12||12}:${p2(m)} ${ap}`;
 };
+const fmtHourLabel = h => h === 0 ? '' : h === 12 ? 'noon' : h < 12 ? `${h} AM` : `${h-12} PM`;
 
-/* DOM builder. Components are pure functions returning elements built with this.
-   Norvig-style: one small primitive that composes into everything else.
-
-   Examples:
-     el('button', { onClick: foo }, 'Save')
-     el('div', { class: 'row' }, el('span', {}, 'a'), el('span', {}, 'b'))
-     el('input', { type: 'text', value: x, onInput: e => set(e.target.value) })            */
+/* DOM builder. Components are pure functions returning elements built with this. */
 const el = (tag, attrs, ...kids) => {
   const n = document.createElement(tag);
   if (attrs) for (const k in attrs) {
     const v = attrs[k];
     if (v == null || v === false) continue;
-    if (k === 'class')        n.className = v;
+    if      (k === 'class')   n.className = v;
     else if (k === 'style')   typeof v === 'string' ? n.setAttribute('style', v) : Object.assign(n.style, v);
     else if (k === 'dataset') Object.assign(n.dataset, v);
     else if (k === 'gesture') Gestures.on(n, v);
@@ -557,8 +923,6 @@ const el = (tag, attrs, ...kids) => {
   return n;
 };
 
-/* SVG icon shorthand — Apple SF Symbols-flavor, hand-rolled minimal set.
-   Each is a function returning a rendered <svg> element. */
 const Icon = {
   back:    () => svg('M15 18l-6-6 6-6', 2),
   plus:    () => svg('M12 5v14M5 12h14', 2.5),
@@ -566,6 +930,15 @@ const Icon = {
   list:    () => svg('M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01', 2),
   search:  () => svg('M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35', 2),
   user:    () => svg('M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z', 1.8),
+  cam:     () => svg('M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2.5-3zM12 17a4 4 0 100-8 4 4 0 000 8z', 1.7),
+  pic:     () => svg('M3 3h18v18H3zM8.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21', 1.7),
+  mic:     () => svg('M9 2h6v11a3 3 0 01-6 0V2zM5 11a7 7 0 0014 0M12 18v4', 1.7),
+  paperclip: () => svg('M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66L9.41 17a2 2 0 11-2.83-2.83l8.49-8.48', 1.7),
+  trash:   () => svg('M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2', 1.7),
+  edit:    () => svg('M12 20h9M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z', 1.7),
+  check:   () => svg('M5 13l4 4L19 7', 2.5),
+  close:   () => svg('M18 6L6 18M6 6l12 12', 2),
+  bell:    () => svg('M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0', 1.7),
 };
 function svg(d, w) {
   const ns = 'http://www.w3.org/2000/svg';
@@ -588,16 +961,13 @@ const SCOPE      = 'https://www.googleapis.com/auth/spreadsheets'
 const SHEET_NAME = 'LifeOS';
 const TAB_NAME   = 'Items';
 
-/* 18-column schema. Each cell holds one concept — no JSON, no parsing.
-   Columns A–I are stable from the old format; J–R are new (split). */
 const HEADER = [
   'id','type','content','date','time','completed','created_at','deleted','end_time',
   'rem_start','rem_every','rem_times',
   'att_kind','att_drive_id','att_thumb','att_name','att_dur','att_size'
 ];
 
-const MON  = ['January','February','March','April','May','June',
-              'July','August','September','October','November','December'];
+const MON  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DOW  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const DOWA = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DOW1 = ['S','M','T','W','T','F','S'];
@@ -605,14 +975,15 @@ const DOW1 = ['S','M','T','W','T','F','S'];
 
 /* ─── 3. STATE ──────────────────────────────────────────────────────────── */
 
-/* The single source of truth. Mutated only through Actions.
-   After any mutation, notify() is called and render reacts. */
 const state = {
-  items:    new Map(),                    // id → Item
-  view:     { name: 'month', date: today() },  // 'month' | 'day' | 'list'
-  history:  [],                           // navigation back-stack
-  modal:    null,                         // null | { mode, item }
-  ctx:      null,                         // null | context menu
+  items:    new Map(),                        // id → Item
+  itemsVer: 0,                                // bump on every item change (for slot signatures)
+  view:     { name: 'month', date: today(), dayMode: 'day' },  // 'month' | 'day' | 'list'
+  history:  [],
+  modal:    null,                             // null | { mode, item, ver }
+  ctx:      null,                             // null | { x, y, item }
+  cmd:      null,                             // null | { open: true }
+  settings: null,                             // null | { open: true }
   toast:    null,
   dark:     localStorage.getItem('lo_dark') !== 'false',
   user:     null,
@@ -620,7 +991,7 @@ const state = {
   tabId:    null,
   token:    null,
   tokenExp: 0,
-  status:   'splash',                     // 'splash' | 'auth' | 'loading' | 'ready'
+  status:   'splash',
 };
 
 const subs = new Set();
@@ -630,74 +1001,42 @@ const notify = () => subs.forEach(fn => fn(state));
 
 /* ─── 4. ACTIONS ────────────────────────────────────────────────────────── */
 
-/* Every mutation goes through one of these. Pure intent, no rendering inside.
-   The render layer subscribes and reacts. */
-
 const Actions = {
+  navigate(view) { state.history.push(state.view); state.view = view; notify(); },
+  back() { if (!state.history.length) return; state.view = state.history.pop(); notify(); },
+  goToday() { state.view = { ...state.view, date: today() }; notify(); },
+  selectDate(date) { state.view = { ...state.view, date }; notify(); },
+  setDayMode(mode) { state.view = { ...state.view, dayMode: mode }; notify(); },
 
-  /* navigation */
-  navigate(view) {
-    state.history.push(state.view);
-    state.view = view;
-    notify();
-  },
-  back() {
-    if (!state.history.length) return;
-    state.view = state.history.pop();
-    notify();
-  },
-  goToday() {
-    state.view = { ...state.view, date: today() };
-    notify();
-  },
-  selectDate(date) {
-    state.view = { ...state.view, date };
-    notify();
-  },
+  upsertItem(item) { state.items.set(item.id, item); state.itemsVer++; notify(); },
+  deleteItem(id)   { state.items.delete(id);          state.itemsVer++; notify(); },
 
-  /* items */
-  upsertItem(item) {
-    state.items.set(item.id, item);
-    notify();
-  },
-  deleteItem(id) {
-    state.items.delete(id);
-    notify();
-  },
-
-  /* modal */
   openNew(date) {
-    state.modal = { mode: 'new', item: blankItem(date || state.view.date) };
+    state.modal = { mode: 'new', item: blankItem(date || state.view.date), ver: 0 };
     notify();
   },
   openEdit(id) {
-    const it = state.items.get(id);
-    if (it) { state.modal = { mode: 'edit', item: { ...it } }; notify(); }
-  },
-  closeModal() {
-    state.modal = null;
+    const it = state.items.get(id); if (!it) return;
+    state.modal = { mode: 'edit', item: { ...it }, ver: 0 };
     notify();
   },
+  closeModal() { state.modal = null; notify(); },
 
-  /* context menu */
-  openCtx(x, y, items) {
-    state.ctx = { x, y, items };
-    notify();
-  },
-  closeCtx() {
-    state.ctx = null;
-    notify();
-  },
+  openCtx(x, y, item) { state.ctx = { x, y, item }; notify(); },
+  closeCtx() { state.ctx = null; notify(); },
 
-  /* toast */
-  toast(msg, kind = 'info') {
-    state.toast = { msg, kind, ts: Date.now() };
-    notify();
+  openCmd()  { state.cmd = { open: true }; notify(); },
+  closeCmd() { state.cmd = null; notify(); },
+
+  openSettings()  { state.settings = { open: true }; notify(); },
+  closeSettings() { state.settings = null; notify(); },
+
+  toast(msg) {
+    state.toast = { msg, ts: Date.now() }; notify();
     const ts = state.toast.ts;
     setTimeout(() => { if (state.toast?.ts === ts) { state.toast = null; notify(); } }, 2400);
   },
 
-  /* theme */
   setDark(dark) {
     state.dark = dark;
     localStorage.setItem('lo_dark', dark);
@@ -706,11 +1045,7 @@ const Actions = {
     notify();
   },
 
-  /* status */
-  setStatus(status) {
-    state.status = status;
-    notify();
-  },
+  setStatus(status) { state.status = status; notify(); },
 };
 
 const blankItem = (date) => ({
@@ -730,30 +1065,20 @@ const blankItem = (date) => ({
 
 /* ─── 5. SYNC ───────────────────────────────────────────────────────────── */
 
-/* Google Sheets adapter. Two responsibilities:
-     (a) read items from the sheet (with schema migration: old 11-col → new 18-col)
-     (b) write changes back, serialized through a queue, with explicit row indices
-
-   No more :append, no more table-boundary detection. We compute the target row
-   ourselves and send updateCells with start.{rowIndex, columnIndex:0}. Bulletproof. */
-
 const Sync = (() => {
-  const BASE = 'https://sheets.googleapis.com/v4/spreadsheets';
+  const BASE  = 'https://sheets.googleapis.com/v4/spreadsheets';
   const DRIVE = 'https://www.googleapis.com/drive/v3';
+  const auth  = () => ({ Authorization: `Bearer ${state.token}`, 'Content-Type': 'application/json' });
 
-  const auth = () => ({ Authorization: `Bearer ${state.token}`, 'Content-Type': 'application/json' });
-
-  const req = (method, url, body) => fetch(url, {
-    method, headers: auth(), body: body && JSON.stringify(body)
+  const req = (m, url, body) => fetch(url, {
+    method: m, headers: auth(), body: body && JSON.stringify(body)
   }).then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(new Error(`${r.status}: ${t}`))));
 
-  const get  = path        => req('GET',  `${BASE}${path}`);
-  const post = (path, body) => req('POST', `${BASE}${path}`, body);
-  const put  = (path, body) => req('PUT',  `${BASE}${path}`, body);
+  const get  = p     => req('GET',  `${BASE}${p}`);
+  const post = (p,b) => req('POST', `${BASE}${p}`, b);
+  const put  = (p,b) => req('PUT',  `${BASE}${p}`, b);
 
-  /* ── SCHEMA: row ↔ item ── */
-
-  const toRow = (i) => [
+  const toRow = i => [
     i.id, i.type, i.content, i.date || '', i.time || '',
     bool(i.completed), i.createdAt, bool(i.deleted), i.endTime || '',
     i.remStart != null ? String(i.remStart) : '', String(i.remEvery || 0), String(i.remTimes || 1),
@@ -761,51 +1086,39 @@ const Sync = (() => {
     i.attName || '', i.attDur ? String(i.attDur) : '', i.attSize ? String(i.attSize) : '',
   ];
 
-  /* Detect old-format rows by looking at column J (index 9).
-     Old format: JSON or URL-encoded JSON for reminders  → starts with '{' or '%7B'
-     New format: a number, or empty                       → digits or empty */
-  const isOldRow = (row) => {
+  const isOldRow = row => {
     const j = row[9];
     if (!j) return false;
     return j.startsWith('{') || j.startsWith('%7B') || j.includes('"');
   };
 
-  const tryParse = (s) => {
+  const tryParse = s => {
     try { return JSON.parse(s.startsWith('%7B') ? decodeURIComponent(s) : s); }
     catch (_) { return null; }
   };
 
   const fromRow = (row, idx) => {
     const item = {
-      id:        row[0] || '',
-      type:      row[1] || 'note',
-      content:   row[2] || '',
-      date:      row[3] || '',
-      time:      row[4] || '',
+      id: row[0] || '', type: row[1] || 'note', content: row[2] || '',
+      date: row[3] || '', time: row[4] || '',
       completed: row[5] === 'TRUE',
-      createdAt: row[6] || '',
-      deleted:   row[7] === 'TRUE',
-      endTime:   row[8] || '',
+      createdAt: row[6] || '', deleted: row[7] === 'TRUE',
+      endTime: row[8] || '',
       remStart: null, remEvery: 0, remTimes: 1,
       attKind: null, attDriveId: '', attThumb: '', attName: '', attDur: 0, attSize: 0,
-      _row:      idx + 2,
+      _row: idx + 2,
     };
-
     if (isOldRow(row)) {
-      // Old format: J = reminders JSON, K = attachment JSON
       const r = tryParse(row[9]) || {};
       item.remStart = r.start ?? null;
       item.remEvery = r.every ?? 0;
       item.remTimes = r.times ?? 1;
       const a = tryParse(row[10] || '') || {};
       if (a.type) {
-        item.attKind     = a.type;
-        item.attDriveId  = a.id   || '';
-        item.attThumb    = a.thumb|| '';
-        item.attDur      = a.dur  || 0;
+        item.attKind = a.type; item.attDriveId = a.id || '';
+        item.attThumb = a.thumb || ''; item.attDur = a.dur || 0;
       }
     } else {
-      // New format
       item.remStart = row[9]  ? +row[9]  : null;
       item.remEvery = row[10] ? +row[10] : 0;
       item.remTimes = row[11] ? +row[11] : 1;
@@ -818,8 +1131,6 @@ const Sync = (() => {
     }
     return item;
   };
-
-  /* ── DRIVE: find or create the LifeOS sheet by name ── */
 
   const findOrCreate = async () => {
     if (state.sheetId) {
@@ -844,19 +1155,16 @@ const Sync = (() => {
 
   const ensureTab = async () => {
     const meta = await get(`/${state.sheetId}?fields=sheets.properties`);
-    const tab  = meta.sheets.find(s => s.properties.title === TAB_NAME);
+    const tab = meta.sheets.find(s => s.properties.title === TAB_NAME);
     state.tabId = (tab || meta.sheets[0]).properties.sheetId;
     if (!tab) {
       await post(`/${state.sheetId}:batchUpdate`, {
         requests: [{ addSheet: { properties: { title: TAB_NAME } } }],
       });
     }
-    // Always rewrite header to the new 18-col schema.
     await put(`/${state.sheetId}/values/${TAB_NAME}!A1:R1?valueInputOption=RAW`,
               { values: [HEADER] });
   };
-
-  /* ── LOAD: pull all items, populate state ── */
 
   const load = async () => {
     await findOrCreate();
@@ -868,23 +1176,19 @@ const Sync = (() => {
       const item = fromRow(rows[i], i);
       if (item.id && !item.deleted) state.items.set(item.id, item);
     }
+    state.itemsVer++;
     cacheItems();
   };
 
-  /* ── WRITE QUEUE ── */
-
   let _q = Promise.resolve();
-  const queue = (fn) => { const next = _q.catch(()=>{}).then(fn); _q = next.catch(()=>{}); return next; };
+  const queue = fn => { const next = _q.catch(()=>{}).then(fn); _q = next.catch(()=>{}); return next; };
 
-  /* Calculate the next available row from local state. Always correct after load. */
   const nextRow = () => {
-    let max = 1;  // header is row 1
+    let max = 1;
     for (const it of state.items.values()) if (it._row && it._row > max) max = it._row;
     return max + 1;
   };
 
-  /* updateCells with explicit start.rowIndex + columnIndex:0 — no boundary
-     detection, no table magic. Writes exactly where we say. */
   const writeRow = (rowIdx, row) =>
     post(`/${state.sheetId}:batchUpdate`, { requests: [{ updateCells: {
       start: { sheetId: state.tabId, rowIndex: rowIdx, columnIndex: 0 },
@@ -892,44 +1196,42 @@ const Sync = (() => {
       fields: 'userEnteredValue',
     }}]});
 
-  const insert = (item) => queue(async () => {
+  const insert = item => queue(async () => {
     if (!state.tabId) await ensureTab();
     const rowNum = nextRow();
     item._row = rowNum;
+    state.items.set(item.id, item);
     await writeRow(rowNum - 1, toRow(item));
     cacheItems();
   });
 
-  const update = (item) => queue(async () => {
+  const update = item => queue(async () => {
     if (!item._row) return insert(item);
+    state.items.set(item.id, item);
     await writeRow(item._row - 1, toRow(item));
     cacheItems();
   });
 
-  const remove = (item) => queue(async () => {
+  const remove = item => queue(async () => {
     if (!item._row) return;
     await post(`/${state.sheetId}:batchUpdate`, { requests: [{ deleteDimension: {
       range: { sheetId: state.tabId, dimension: 'ROWS', startIndex: item._row - 1, endIndex: item._row },
     }}]});
-    // Row indices shifted up — refetch to stay in sync.
     await load();
   });
 
-  /* push: dispatch insert vs update based on _row presence */
-  const push = (item) => item._row ? update(item) : insert(item);
-
-  /* ── LOCAL CACHE ── */
+  const push = item => item._row ? update(item) : insert(item);
 
   const cacheItems = () => {
     try { localStorage.setItem('lo_cache', JSON.stringify([...state.items.values()])); }
     catch (_) {}
   };
-
   const restoreCache = () => {
     try {
       const arr = JSON.parse(localStorage.getItem('lo_cache') || '[]');
       state.items.clear();
       for (const it of arr) state.items.set(it.id, it);
+      state.itemsVer++;
     } catch (_) {}
   };
 
@@ -945,7 +1247,6 @@ const Auth = {
     if (tries > 80) return;
     setTimeout(() => Auth.whenGIS(cb, tries + 1), 100);
   },
-
   signIn() {
     if (typeof google === 'undefined') return Actions.toast('Google script not loaded');
     google.accounts.oauth2.initTokenClient({
@@ -958,7 +1259,6 @@ const Auth = {
       },
     }).requestAccessToken({ prompt: 'select_account' });
   },
-
   silentRefresh() {
     return new Promise(resolve => {
       if (Date.now() < state.tokenExp) return resolve(true);
@@ -974,84 +1274,72 @@ const Auth = {
       }).requestAccessToken({ prompt: '' });
     });
   },
-
   async boot() {
     Actions.setStatus('loading');
     try {
       await Sync.load();
       Auth.fetchUser();
       Actions.setStatus('ready');
+      Reminders.scheduleAll();
     } catch (e) {
       console.error(e);
       Actions.toast('Could not load: ' + e.message);
       Actions.setStatus('auth');
     }
   },
-
   async fetchUser() {
     if (!state.token) return;
     try {
       const u = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',
         { headers: { Authorization: `Bearer ${state.token}` } }).then(r => r.json());
-      state.user = u;
-      notify();
+      state.user = u; notify();
     } catch (_) {}
   },
-
   signOut() {
     state.token = null; state.tokenExp = 0;
     state.items.clear(); state.user = null;
+    state.itemsVer++;
     localStorage.removeItem('lo_cache');
     Actions.setStatus('auth');
+    Actions.closeSettings();
   },
 };
 
 
 /* ─── 7. GESTURES ───────────────────────────────────────────────────────── */
 
-/* Single pointer-event dispatcher. Distinguishes tap, long-press, drag.
-   Components register handlers per element via `gesture: { ... }` on el().
-   No touch-action conflicts, no competing listeners — ONE truth. */
-
 const Gestures = (() => {
   const handlers = new WeakMap();
   let p = null;
-
-  const find = (target) => {
+  const find = target => {
     for (let n = target; n; n = n.parentElement) {
       if (handlers.has(n)) return [n, handlers.get(n)];
     }
     return [null, null];
   };
-
   const on = (node, fns) => { handlers.set(node, fns); };
 
   addEventListener('pointerdown', e => {
     if (!e.isPrimary) return;
     const [node, fns] = find(e.target);
     if (!fns) return;
-    p = {
-      node, fns, x0: e.clientX, y0: e.clientY, t0: Date.now(),
-      moved: false, longTimer: null, consumed: false,
-    };
+    p = { node, fns, x0: e.clientX, y0: e.clientY, t0: Date.now(),
+          moved: false, longTimer: null, consumed: false };
     if (fns.onLongPress) {
       p.longTimer = setTimeout(() => {
         if (p && !p.moved) { p.consumed = true; fns.onLongPress({ x: p.x0, y: p.y0, node }); }
       }, 500);
     }
   });
-
   addEventListener('pointermove', e => {
     if (!p) return;
     const dx = e.clientX - p.x0, dy = e.clientY - p.y0;
     if (!p.moved && Math.hypot(dx, dy) > 10) {
-      p.moved = true;
-      clearTimeout(p.longTimer);
+      p.moved = true; clearTimeout(p.longTimer);
     }
     if (p.moved && p.fns.onDrag) p.fns.onDrag({ dx, dy });
   });
-
-  const finish = (e) => {
+  addEventListener('pointerup', e => {
     if (!p) return;
     clearTimeout(p.longTimer);
     if (!p.consumed) {
@@ -1062,48 +1350,37 @@ const Gestures = (() => {
       }
     }
     p = null;
-  };
-
-  addEventListener('pointerup', finish);
+  });
   addEventListener('pointercancel', () => { if (p) clearTimeout(p.longTimer); p = null; });
-
   return { on };
 })();
 
 
 /* ─── 8. DATE PARSER ────────────────────────────────────────────────────── */
 
-/* Natural-language → Date for the command palette quick-jump.
-   Returns null if not parseable. */
-
 const DateParser = (() => {
-
   const HOLIDAYS = {
-    'christmas':   y => new Date(y, 11, 25),
-    'newyear':     y => new Date(y, 0, 1),
-    'newyears':    y => new Date(y, 0, 1),
-    'halloween':   y => new Date(y, 9, 31),
-    'valentines':  y => new Date(y, 1, 14),
-    'thanksgiving':y => { // 4th Thursday of November
-      const d = new Date(y, 10, 1);
-      const offset = (4 - d.getDay() + 7) % 7;
-      return new Date(y, 10, 1 + offset + 21);
-    },
-    'july4':       y => new Date(y, 6, 4),
+    christmas:    y => new Date(y, 11, 25),
+    newyear:      y => new Date(y, 0, 1),
+    newyears:     y => new Date(y, 0, 1),
+    halloween:    y => new Date(y, 9, 31),
+    valentines:   y => new Date(y, 1, 14),
+    thanksgiving: y => { const d = new Date(y, 10, 1);
+                         const off = (4 - d.getDay() + 7) % 7;
+                         return new Date(y, 10, 1 + off + 21); },
+    july4:        y => new Date(y, 6, 4),
   };
 
-  const parse = (raw) => {
+  const parse = raw => {
     const s = (raw || '').trim();
     if (!s) return null;
     const lc = s.toLowerCase();
     const t  = today();
 
-    // Today / tomorrow / yesterday
     if (lc === 'today') return t;
-    if (/^tom(orrow)?$/.test(lc)) return addDays(t, 1);
+    if (/^tom(orrow)?$/.test(lc))  return addDays(t, 1);
     if (/^yest(erday)?$/.test(lc)) return addDays(t, -1);
 
-    // "next/this/last <day-of-week>"
     const dow = lc.match(/^(next|this|last)\s+(sun|mon|tue|wed|thu|fri|sat)/);
     if (dow) {
       const target = ['sun','mon','tue','wed','thu','fri','sat'].indexOf(dow[2]);
@@ -1114,12 +1391,11 @@ const DateParser = (() => {
       return addDays(t, diff);
     }
 
-    // "in N {day|week|month|year}s" / "N ... ago"
     const rel = lc.match(/^(?:in\s+)?(\d+)\s+(day|week|month|year)s?(\s+ago)?$/);
     if (rel) {
-      const n    = parseInt(rel[1], 10) * (rel[3] ? -1 : 1);
+      const n = parseInt(rel[1], 10) * (rel[3] ? -1 : 1);
       const unit = rel[2];
-      const d    = new Date(t);
+      const d = new Date(t);
       if      (unit === 'day')   d.setDate(d.getDate() + n);
       else if (unit === 'week')  d.setDate(d.getDate() + n * 7);
       else if (unit === 'month') d.setMonth(d.getMonth() + n);
@@ -1127,26 +1403,22 @@ const DateParser = (() => {
       return d;
     }
 
-    // Holidays. Optional year suffix, e.g. "christmas 2030".
     const yMatch = s.match(/(\d{4})/);
     const year   = yMatch ? +yMatch[1] : t.getFullYear();
     const word   = lc.replace(/\d{4}/, '').replace(/[^a-z]/g, '');
     const fn     = HOLIDAYS[word];
     if (fn) return fn(year);
 
-    // Fall through to JS Date constructor (handles "Mar 10 1997", "3/10/97",
-    // "2026-12-31", and many others).
     const d = new Date(s);
     if (!isNaN(d.getTime())) return d;
-
     return null;
   };
 
-  const describe = (d) => {
+  const describe = d => {
     if (!d) return null;
-    const t       = today();
-    const days    = Math.round((d - t) / 86400000);
-    const main    = `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    const t    = today();
+    const days = Math.round((d - t) / 86400000);
+    const main = `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
     let rel = '';
     if      (days === 0)               rel = ' · today';
     else if (days === 1)               rel = ' · tomorrow';
@@ -1164,43 +1436,244 @@ const DateParser = (() => {
 })();
 
 
-/* ─── 9. RENDER ─────────────────────────────────────────────────────────── */
+/* ─── 9. MARKDOWN ──────────────────────────────────────────────────────── */
 
-/* One render entry point. Subscribed to state changes.
-   For Session 1 this is a full re-render (simple). Session 2 introduces
-   slot-based re-rendering for components whose state slice didn't change,
-   to preserve focus / scroll. */
+const Markdown = (() => {
+  const inline = s => {
+    let h = String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    h = h.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    h = h.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
+    h = h.replace(/\*(.+?)\*/g,         '<em>$1</em>');
+    h = h.replace(/`(.+?)`/g,           '<code class="md-code">$1</code>');
+    h = h.replace(/(https?:\/\/[^\s<&]+)/g, '<a href="$1" target="_blank" rel="noopener" class="md-link" onclick="event.stopPropagation()">$1</a>');
+    return h;
+  };
+  const render = raw => {
+    if (!raw) return '';
+    return raw.split('\n').map(line => {
+      let m;
+      if (m = line.match(/^> (.*)/))         return `<span class="md-q">${inline(m[1])}</span>`;
+      if (m = line.match(/^### (.*)/))       return `<span class="md-h3">${inline(m[1])}</span>`;
+      if (m = line.match(/^## (.*)/))        return `<span class="md-h2">${inline(m[1])}</span>`;
+      if (m = line.match(/^# (.*)/))         return `<span class="md-h1">${inline(m[1])}</span>`;
+      if (m = line.match(/^[-*+] (.*)/))     return `<span class="md-li">•&nbsp;${inline(m[1])}</span>`;
+      if (m = line.match(/^(\d+)\. (.*)/))   return `<span class="md-li">${m[1]}.&nbsp;${inline(m[2])}</span>`;
+      if (line === '')                        return '<span class="md-br"></span>';
+      return `<span>${inline(line)}</span>`;
+    }).join('');
+  };
+  return { render };
+})();
 
-const root = $('root');
 
-let _rafScheduled = false;
-const scheduleRender = () => {
-  if (_rafScheduled) return;
-  _rafScheduled = true;
-  requestAnimationFrame(() => {
-    _rafScheduled = false;
-    renderApp();
+/* ─── 10. ATTACHMENTS ──────────────────────────────────────────────────── */
+
+const Attach = (() => {
+  /* Compress an image file into:
+     - full: a Blob suitable for upload to Drive (max 1200px, JPEG q .8)
+     - thumb: a base64 data URL (max 120px, JPEG q .5) for inline display
+     The thumbnail (3-5KB) lives in the sheet, the full image in Drive. */
+  const compress = file => new Promise((ok, fail) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const draw = (max) => {
+        const r = Math.min(max / img.width, max / img.height, 1);
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * r); cv.height = Math.round(img.height * r);
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        return cv;
+      };
+      draw(1200).toBlob(blob => {
+        const thumb = draw(120).toDataURL('image/jpeg', 0.5);
+        ok({ full: blob, thumb });
+      }, 'image/jpeg', 0.8);
+    };
+    img.onerror = fail;
+    img.src = url;
   });
-};
 
+  const uploadDrive = async (blob, name, mime) => {
+    const meta = JSON.stringify({ name, mimeType: mime });
+    const form = new FormData();
+    form.append('metadata', new Blob([meta], { type: 'application/json' }));
+    form.append('file', blob);
+    const r = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+      { method: 'POST', headers: { Authorization: `Bearer ${state.token}` }, body: form }
+    );
+    if (!r.ok) throw new Error(await r.text());
+    return (await r.json()).id;
+  };
+
+  /* Pick image from gallery or camera, return { kind, driveId, thumb } */
+  const pickImage = (camera = false) => new Promise((ok, fail) => {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    if (camera) inp.capture = 'environment';
+    inp.onchange = async () => {
+      const file = inp.files?.[0];
+      if (!file) return ok(null);
+      try {
+        const { full, thumb } = await compress(file);
+        const id = await uploadDrive(full, `photo-${Date.now()}.jpg`, 'image/jpeg');
+        ok({ kind: 'image', driveId: id, thumb });
+      } catch (e) { fail(e); }
+    };
+    inp.click();
+  });
+
+  const fetchDriveBlob = async (driveId) => {
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${driveId}?alt=media`,
+      { headers: { Authorization: `Bearer ${state.token}` } });
+    if (!r.ok) throw new Error(r.status);
+    return r.blob();
+  };
+
+  const _cache = {};
+  const showImage = async driveId => {
+    let url = _cache[driveId];
+    if (!url) {
+      try { url = URL.createObjectURL(await fetchDriveBlob(driveId)); _cache[driveId] = url; }
+      catch (e) { return Actions.toast('Could not load image'); }
+    }
+    showLightbox(url);
+  };
+
+  const showLightbox = (src) => {
+    const lb = el('div', {
+      style: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,.95)',
+               zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' },
+      onClick: () => lb.remove(),
+    }, el('img', { src, style: { maxWidth: '95vw', maxHeight: '95vh', objectFit: 'contain' } }));
+    document.body.appendChild(lb);
+  };
+
+  return { pickImage, showImage, showLightbox };
+})();
+
+
+/* ─── 11. REMINDERS ────────────────────────────────────────────────────── */
+
+const Reminders = (() => {
+  const timers = [];
+
+  const requestPerm = () => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') Notification.requestPermission();
+  };
+
+  const fire = (item, minutesBefore) => {
+    if (Notification.permission !== 'granted') {
+      Actions.toast(`⏰ ${item.content} — in ${minutesBefore} min`);
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      return;
+    }
+    try {
+      new Notification('LifeOS', {
+        body: `${item.content} — in ${minutesBefore} min`,
+        icon: 'icon.svg', tag: item.id + '-' + minutesBefore,
+        requireInteraction: true,
+      });
+    } catch (e) { console.warn('Notification:', e); }
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  };
+
+  const scheduleOne = item => {
+    if (!item.remStart || !item.date || !item.time || item.completed) return;
+    const [h, m] = item.time.split(':').map(Number);
+    const at = parseDs(item.date); at.setHours(h, m, 0, 0);
+    const eventMs = at.getTime();
+    const count = item.remEvery ? item.remTimes : 1;
+    for (let k = 0; k < count; k++) {
+      const minBefore = item.remStart - k * (item.remEvery || 0);
+      const fireAt = eventMs - minBefore * 60000;
+      const delay = fireAt - Date.now();
+      if (delay > 0 && delay < 48 * 3600000) {
+        timers.push(setTimeout(() => fire(item, minBefore), delay));
+      }
+    }
+  };
+
+  const scheduleAll = () => {
+    timers.forEach(clearTimeout); timers.length = 0;
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      requestPerm();
+    }
+    for (const it of state.items.values()) scheduleOne(it);
+  };
+
+  return { scheduleAll, requestPerm };
+})();
+
+
+/* ─── 12. RENDER (slot-based) ──────────────────────────────────────────── */
+
+/* Render only slots whose signature changed. Each slot has its own DOM mount,
+   so a state change to (say) the modal doesn't blow away the calendar's scroll
+   position, and editing the modal textarea doesn't trigger re-renders at all
+   (form values live in the DOM, only state.modal identity drives the re-render). */
+
+const Slots = (() => {
+  const last = new Map();
+  const slot = (mountId, key, buildFn) => {
+    const sig = key == null ? null : JSON.stringify(key);
+    if (last.get(mountId) === sig) return;
+    last.set(mountId, sig);
+    const mount = $(mountId);
+    if (!mount) return;
+    if (sig == null) { mount.replaceChildren(); return; }
+    const tree = buildFn();
+    mount.replaceChildren(...(tree ? [tree] : []));
+  };
+  return { slot };
+})();
+
+let _rafQ = false;
+const scheduleRender = () => {
+  if (_rafQ) return;
+  _rafQ = true;
+  requestAnimationFrame(() => { _rafQ = false; render(); });
+};
 subscribe(scheduleRender);
 
-const renderApp = () => {
-  // Apply theme class
+const render = () => {
   document.documentElement.classList.toggle('dark', state.dark);
   document.documentElement.classList.toggle('light', !state.dark);
 
-  // Build the root tree based on top-level status
-  const tree =
-    state.status === 'splash'  ? Splash() :
-    state.status === 'auth'    ? AuthScreen() :
-    state.status === 'loading' ? Splash('Loading your items…') :
-    state.status === 'ready'   ? AppShell() :
-                                 Splash();
+  // Main app
+  Slots.slot('root', {
+    s: state.status,
+    v: state.view.name,
+    d: state.view.date.getTime(),
+    m: state.view.dayMode,
+    h: state.history.length,
+    iv: state.itemsVer,
+  }, buildAppTree);
 
-  root.replaceChildren(tree);
+  // Modal
+  Slots.slot('modalRoot',
+    state.modal ? { mode: state.modal.mode, id: state.modal.item.id } : null,
+    () => Modal());
 
-  // Toast (overlay, lives outside main tree)
+  // Context menu
+  Slots.slot('ctxRoot',
+    state.ctx ? { x: state.ctx.x, y: state.ctx.y, id: state.ctx.item.id, ver: state.itemsVer } : null,
+    () => ContextMenu());
+
+  // Command palette
+  Slots.slot('cmdRoot',
+    state.cmd?.open ? 'open' : null,
+    () => CommandPalette());
+
+  // Settings
+  Slots.slot('settingsRoot',
+    state.settings?.open ? { user: state.user?.email, dark: state.dark } : null,
+    () => Settings());
+
+  // Toast (rendered to body, not a slot)
   if (state.toast) renderToast();
 };
 
@@ -1214,12 +1687,15 @@ const renderToast = () => {
 };
 
 
-/* ─── 10. COMPONENTS ────────────────────────────────────────────────────── */
+/* ─── 13. COMPONENTS ───────────────────────────────────────────────────── */
 
-/* Pure functions of state → DOM tree. Built using el().
-   Session 1 includes the bare minimum to render a working sign-in flow and
-   a basic month view. Session 2 fills in DayView, ListView, Modal, ContextMenu,
-   CommandPalette. */
+const buildAppTree = () => {
+  if (state.status === 'splash')  return Splash();
+  if (state.status === 'auth')    return AuthScreen();
+  if (state.status === 'loading') return Splash('Loading your items…');
+  if (state.status === 'ready')   return AppShell();
+  return Splash();
+};
 
 const Splash = (msg = 'Loading…') =>
   el('div', { class: 'splash' },
@@ -1231,14 +1707,15 @@ const AuthScreen = () =>
     el('div', { class: 'auth-logo' }, '📅'),
     el('div', { class: 'auth-name' }, 'LifeOS'),
     el('div', { class: 'auth-sub' }, 'Calendar, todos and notes — in your Google Drive'),
-    el('button', { class: 'auth-btn', onClick: Auth.signIn },
-      'Sign in with Google'));
+    el('button', { class: 'auth-btn', onClick: Auth.signIn }, 'Sign in with Google'));
 
 const AppShell = () =>
   el('div', { style: { display: 'flex', flexDirection: 'column', height: '100%' } },
     TopBar(),
     el('div', { class: 'content' }, currentView()),
     TabBar());
+
+/* TopBar */
 
 const TopBar = () => {
   const { view } = state;
@@ -1247,15 +1724,14 @@ const TopBar = () => {
 
   return el('header', { class: 'topbar' },
     el('div', { class: 'topbar-left' },
-      canBack && el('button', { class: 'btn-back', onClick: Actions.back },
-        Icon.back(), 'Back')),
-    el('div', { class: 'topbar-title', onClick: () => Actions.back() }, title),
+      canBack && el('button', { class: 'btn-back', onClick: Actions.back }, Icon.back(), 'Back')),
+    el('div', { class: 'topbar-title', onClick: Actions.back }, title),
     el('div', { class: 'topbar-right' },
       el('button', { class: 'btn-text', onClick: Actions.goToday }, 'Today'),
       el('button', { class: 'btn-icon', onClick: () => Actions.openNew() }, Icon.plus())));
 };
 
-const titleFor = (view) => {
+const titleFor = view => {
   const d = view.date;
   if (view.name === 'month') return `${MON[d.getMonth()]} ${d.getFullYear()}`;
   if (view.name === 'day')   return `${DOWA[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`;
@@ -1263,48 +1739,41 @@ const titleFor = (view) => {
   return '';
 };
 
-const TabBar = () =>
-  el('nav', { class: 'tabbar' },
-    Tab('cal',  'Calendar', Icon.cal,    state.view.name === 'month' || state.view.name === 'day'),
-    Tab('list', 'List',     Icon.list,   state.view.name === 'list'),
-    Tab('search','Search',  Icon.search, false),
-    Tab('user', 'Profile',  Icon.user,   false));
+/* TabBar */
 
-const Tab = (key, label, iconFn, on) =>
-  el('button', { class: 'tab' + (on ? ' on' : ''),
-    onClick: () => {
-      if (key === 'cal')   Actions.navigate({ name: 'month', date: state.view.date });
-      if (key === 'list')  Actions.navigate({ name: 'list', date: state.view.date });
-      if (key === 'search') Actions.toast('Search coming in Session 2');
-      if (key === 'user')   Actions.toast('Settings coming in Session 2');
-    }},
-    iconFn(),
-    el('span', {}, label));
+const TabBar = () => {
+  const isCal = state.view.name === 'month' || state.view.name === 'day';
+  return el('nav', { class: 'tabbar' },
+    Tab('cal',  'Calendar', Icon.cal,    isCal,                     () => Actions.navigate({ name: 'month', date: state.view.date, dayMode: 'day' })),
+    Tab('list', 'List',     Icon.list,   state.view.name === 'list',() => Actions.navigate({ name: 'list', date: state.view.date, dayMode: 'day' })),
+    Tab('search','Search',  Icon.search, false,                     Actions.openCmd),
+    Tab('user', 'Profile',  Icon.user,   false,                     Actions.openSettings));
+};
+const Tab = (key, label, iconFn, on, fn) =>
+  el('button', { class: 'tab' + (on ? ' on' : ''), onClick: fn },
+    iconFn(), el('span', {}, label));
 
 const currentView = () => {
   switch (state.view.name) {
     case 'month': return MonthView();
-    case 'day':   return DayViewStub();
-    case 'list':  return ListViewStub();
+    case 'day':   return DayView();
+    case 'list':  return ListView();
     default:      return el('div', {});
   }
 };
 
-/* MonthView — Session 1 includes the calendar grid + selected day list.
-   Apple-style: clean grid above, day's items list below. No floating sheets. */
+/* MonthView */
+
 const MonthView = () => {
   const sel = state.view.date;
   const cells = monthCells(sel);
   const dayItems = sortByTime(itemsOnDate(sel));
 
   return el('div', { class: 'month' },
-    // Day-of-week header
     el('div', { class: 'month-dow' },
       DOW1.map((d, i) => el('div', { class: (i === 0 || i === 6) ? 'weekend' : '' }, d))),
-    // Grid (6 weeks)
     el('div', { class: 'month-grid' },
       cells.map(cell => DayCell(cell, sel))),
-    // Day's items list below
     DayList(sel, dayItems));
 };
 
@@ -1321,7 +1790,10 @@ const DayCell = (cell, selDate) => {
         + (isToday ? ' today' : '')
         + (isSel   ? ' selected' : ''),
       gesture: {
-        onTap: () => Actions.selectDate(cell.date),
+        onTap: () => {
+          if (isSel) Actions.navigate({ name: 'day', date: cell.date, dayMode: 'day' });
+          else Actions.selectDate(cell.date);
+        },
         onLongPress: () => Actions.openNew(cell.date),
       },
     },
@@ -1334,61 +1806,579 @@ const DayList = (date, items) =>
   el('div', { class: 'day-list' },
     el('div', { class: 'day-list-header' },
       el('strong', {}, dateLabel(date)),
-      el('span', {}, items.length === 0 ? 'No items' : `${items.length} item${items.length === 1 ? '' : 's'}`)),
+      el('span', {}, items.length === 0 ? 'No items · tap day to drill in, long-press to add' : `${items.length} item${items.length === 1 ? '' : 's'}`)),
     items.length === 0
       ? el('div', { class: 'empty-state' }, 'Tap + or long-press the day to add')
       : items.map(ItemRow));
 
-const ItemRow = (item) =>
+const ItemRow = item =>
   el('div', { class: 'item-row' + (item.completed ? ' done' : ''),
     gesture: {
       onTap:       () => Actions.openEdit(item.id),
-      onLongPress: ev => openContextMenu(ev, item),
+      onLongPress: ev => Actions.openCtx(ev.x, ev.y, item),
     }},
     el('div', { class: 'item-bar ' + item.type }),
     el('div', { class: 'item-time' + (item.time ? '' : ' allday') },
       item.time ? fmtTimeShort(item.time) : 'all-day'),
     el('div', { class: 'item-body' },
-      el('div', { class: 'item-content' }, item.content)),
+      el('div', { class: 'item-content', html: Markdown.render(item.content) }),
+      item.attKind === 'image' && item.attThumb &&
+        el('div', { class: 'item-attachments' },
+          el('img', { class: 'item-thumb', src: item.attThumb,
+            onClick: e => { e.stopPropagation(); Attach.showImage(item.attDriveId); } })),
+      item.remStart != null && item.time &&
+        el('span', { class: 'item-rem-tag' }, '⏰ ', `${item.remStart} min before`)),
     item.type === 'todo' && el('div', {
       class: 'item-checkbox' + (item.completed ? ' on' : ''),
       onClick: e => { e.stopPropagation(); toggleDone(item); },
     }));
 
-const DayViewStub = () =>
-  el('div', { class: 'empty-state', style: { padding: '60px 20px' } },
-    'Day view — coming in Session 2');
+/* DayView (with mode selector: Day | Multi-day | List) */
 
-const ListViewStub = () =>
-  el('div', { class: 'empty-state', style: { padding: '60px 20px' } },
-    'List view — coming in Session 2');
-
-const openContextMenu = (ev, item) => {
-  // Stub: just toast for now. Session 2 builds the dynamic context menu.
-  Actions.toast(`Long-pressed: ${item.content || '(empty)'}`);
+const DayView = () => {
+  const mode = state.view.dayMode || 'day';
+  return el('div', { class: 'day-view' },
+    el('div', { class: 'seg-bar' },
+      el('div', { class: 'seg-ctl' },
+        Seg('day',  'Day',       mode === 'day'),
+        Seg('multi','Multi-day', mode === 'multi'),
+        Seg('list', 'List',      mode === 'list'))),
+    mode === 'day'   ? DayTimeline(state.view.date) :
+    mode === 'multi' ? MultiTimeline(state.view.date) :
+                       DayLinearList(state.view.date));
 };
 
-const toggleDone = async (item) => {
-  if (item.type !== 'todo') return;
-  const updated = { ...item, completed: !item.completed };
-  Actions.upsertItem(updated);
-  try { await Sync.push(updated); }
-  catch (e) { Actions.toast('Could not save'); Actions.upsertItem(item); }
+const Seg = (key, label, on) =>
+  el('button', { class: 'seg' + (on ? ' on' : ''), onClick: () => Actions.setDayMode(key) }, label);
+
+const DayTimeline = date => {
+  const items   = itemsOnDate(date);
+  const allDay  = items.filter(i => !i.time);
+  const timed   = items.filter(i => i.time);
+  const isToday = sameDay(date, today());
+
+  const tlNode = el('div', { class: 'timeline',
+    ref: scrollEl => requestAnimationFrame(() => {
+      const h = isToday ? today().getHours() : 8;
+      scrollEl.scrollTop = Math.max(0, h * 60 - scrollEl.clientHeight / 3);
+    })},
+    el('div', { class: 'timeline-inner' },
+      Array.from({ length: 24 }, (_, h) =>
+        el('div', { class: 'hour-row', style: { top: (h * 60) + 'px' },
+          gesture: { onTap: ev => {
+            const cv = tlNode.getBoundingClientRect();
+            const yInRow = ev.y - cv.top + tlNode.scrollTop - h * 60;
+            const min = Math.round(yInRow / 60 * 60 / 15) * 15;
+            const total = h * 60 + Math.min(min, 45);
+            const newDate = new Date(date);
+            const item = blankItem(newDate);
+            item.time = `${p2(Math.floor(total / 60))}:${p2(total % 60)}`;
+            item.type = 'event';
+            state.modal = { mode: 'new', item, ver: 0 }; notify();
+          }}},
+          el('div', { class: 'hour-lbl' }, fmtHourLabel(h)),
+          el('div', { class: 'hour-line' }))),
+      el('div', { class: 'timeline-events' },
+        timed.map(TimelineEvent)),
+      isToday && el('div', { class: 'now-line', style: {
+        top: ((today().getHours() + today().getMinutes() / 60) * 60) + 'px'
+      }}, el('div', { class: 'now-dot' }))));
+
+  return el('div', { style: { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 } },
+    allDay.length > 0 && el('div', { class: 'tl-allday' },
+      allDay.map(it => el('div', { class: 'tl-allday-pill ' + it.type,
+        gesture: { onTap: () => Actions.openEdit(it.id),
+                   onLongPress: ev => Actions.openCtx(ev.x, ev.y, it) }},
+        it.content))),
+    tlNode);
+};
+
+const TimelineEvent = item => {
+  const [h, m] = item.time.split(':').map(Number);
+  const startMin = h * 60 + m;
+  const dur = item.endTime
+    ? (() => { const [eh, em] = item.endTime.split(':').map(Number); return Math.max(20, eh*60+em - startMin); })()
+    : 50;
+  return el('div', {
+    class: 'tl-event ' + item.type + (item.completed ? ' done' : ''),
+    style: { top: startMin + 'px', height: dur + 'px', left: '0', right: '0' },
+    gesture: { onTap: () => Actions.openEdit(item.id),
+               onLongPress: ev => Actions.openCtx(ev.x, ev.y, item) },
+  },
+    el('div', { class: 'tl-event-title' }, item.content),
+    dur > 28 && el('div', { class: 'tl-event-time' },
+      fmtTimeShort(item.time) + (item.endTime ? ' – ' + fmtTimeShort(item.endTime) : '')));
+};
+
+const MultiTimeline = date => {
+  const start = wkStart(date);
+  const days  = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+  const isTodayDay = days.findIndex(d => sameDay(d, today()));
+
+  return el('div', { class: 'multi' },
+    el('div', { class: 'multi-hdr' },
+      el('div', { class: 'empty' }),
+      days.map(d => el('div', {
+        class: 'multi-day-hdr'
+          + (sameDay(d, today())  ? ' today'    : '')
+          + (sameDay(d, date)     ? ' selected' : ''),
+        onClick: () => Actions.selectDate(d),
+      },
+        el('div', { class: 'multi-day-name' }, DOWA[d.getDay()]),
+        el('div', { class: 'multi-day-num' }, String(d.getDate()))))),
+    el('div', { class: 'multi-body',
+      ref: scrollEl => requestAnimationFrame(() => {
+        const h = isTodayDay >= 0 ? today().getHours() : 8;
+        scrollEl.scrollTop = Math.max(0, h * 60 - scrollEl.clientHeight / 3);
+      })},
+      el('div', { class: 'multi-cols' },
+        // Hour labels column
+        el('div', { class: 'multi-times', style: { position: 'relative' } },
+          Array.from({ length: 24 }, (_, h) =>
+            el('div', { class: 'hour-lbl', style: { position: 'absolute', top: (h * 60 - 7) + 'px' } },
+              fmtHourLabel(h)))),
+        // Day columns
+        days.map(d => el('div', { class: 'multi-col',
+          gesture: { onTap: () => { Actions.selectDate(d); Actions.setDayMode('day'); } }},
+          // hour grid lines
+          Array.from({ length: 24 }, (_, h) =>
+            el('div', { style: { position: 'absolute', left: 0, right: 0, top: (h * 60) + 'px',
+                                  height: '1px', background: 'var(--sep-th)' } })),
+          // events
+          el('div', { class: 'multi-col-events' },
+            sortByTime(itemsOnDate(d)).filter(i => i.time).map(TimelineEvent)))))));
+};
+
+const DayLinearList = date => {
+  // Show items from this date forward, grouped by date
+  const all = [...state.items.values()]
+    .filter(i => i.date && parseDs(i.date) >= startOfDay(date))
+    .sort((a, b) => (a.date + (a.time || 'z')).localeCompare(b.date + (b.time || 'z')));
+
+  const grouped = groupByDate(all);
+
+  return el('div', { class: 'list-body' },
+    Object.keys(grouped).length === 0
+      ? el('div', { class: 'empty-state' }, 'No upcoming items')
+      : Object.entries(grouped).map(([dKey, items]) => [
+          el('div', { class: 'list-section-hdr' + (dKey === ds(today()) ? ' today' : '') },
+            dateLabel(parseDs(dKey))),
+          ...items.map(ItemRow),
+        ]).flat());
+};
+
+/* ListView */
+
+const ListView = () => {
+  const grouped = groupByDate(
+    [...state.items.values()].sort((a, b) => (b.date + (b.time||'')).localeCompare(a.date + (a.time||'')))
+  );
+  return el('div', { class: 'list-view' },
+    el('div', { class: 'list-body' },
+      Object.keys(grouped).length === 0
+        ? el('div', { class: 'empty-state' }, 'Nothing yet — tap + to add')
+        : Object.entries(grouped).map(([dKey, items]) => [
+            el('div', { class: 'list-section-hdr' + (dKey === ds(today()) ? ' today' : '') },
+              dKey === '' ? 'No date' : dateLabel(parseDs(dKey))),
+            ...items.map(ItemRow),
+          ]).flat()));
+};
+
+/* Modal — pure component but form values live in DOM (controlled by save handler) */
+
+const Modal = () => {
+  if (!state.modal) return null;
+  const { mode, item } = state.modal;
+
+  // Local form state lives here, captured in closure. The slot system ensures
+  // the modal isn't re-rendered while open (key = mode+item.id).
+  const form = { ...item };
+  let attachEl = null;
+
+  const updateAttach = () => {
+    if (!attachEl) return;
+    attachEl.replaceChildren(...buildAttachContents());
+  };
+
+  const buildAttachContents = () => {
+    const out = [];
+    out.push(el('div', { class: 'attach-row' },
+      el('button', { class: 'attach-btn', onClick: async () => {
+        try {
+          const r = await Attach.pickImage(true);
+          if (r) { form.attKind = r.kind; form.attDriveId = r.driveId; form.attThumb = r.thumb; updateAttach(); }
+        } catch (e) { Actions.toast('Camera failed: ' + e.message); }
+      }}, Icon.cam(), 'Camera'),
+      el('button', { class: 'attach-btn', onClick: async () => {
+        try {
+          const r = await Attach.pickImage(false);
+          if (r) { form.attKind = r.kind; form.attDriveId = r.driveId; form.attThumb = r.thumb; updateAttach(); }
+        } catch (e) { Actions.toast('Image failed: ' + e.message); }
+      }}, Icon.pic(), 'Gallery')));
+    if (form.attKind === 'image' && form.attThumb) {
+      out.push(el('div', { class: 'attach-preview' },
+        el('div', { style: { position: 'relative', display: 'inline-block' } },
+          el('img', { class: 'attach-thumb', src: form.attThumb }),
+          el('div', { class: 'attach-x', style: { position: 'absolute', top: '4px', right: '4px' },
+            onClick: () => { form.attKind = null; form.attDriveId = ''; form.attThumb = ''; updateAttach(); } },
+            '✕'))));
+    }
+    return out;
+  };
+
+  const setType = t => {
+    form.type = t;
+    document.querySelectorAll('.type-opt').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    document.querySelectorAll('.type-opt').forEach(b => {
+      ['note','todo','event'].forEach(c => b.classList.remove(c));
+      b.classList.add(b.dataset.t);
+    });
+    document.getElementById('end-time-row').style.display = t === 'event' ? 'flex' : 'none';
+  };
+
+  const save = async () => {
+    const content = document.getElementById('m-content').value.trim();
+    if (!content) return Actions.toast('Enter some text');
+    form.content = content;
+    form.date = document.getElementById('m-date').value;
+    form.time = document.getElementById('m-time').value;
+    form.endTime = document.getElementById('m-endtime').value;
+    const remToggle = document.getElementById('rem-toggle').classList.contains('on');
+    if (remToggle) {
+      form.remStart = parseInt(document.getElementById('rem-start').value, 10);
+      form.remEvery = parseInt(document.getElementById('rem-every').value, 10);
+      form.remTimes = parseInt(document.getElementById('rem-times').value, 10);
+    } else {
+      form.remStart = null; form.remEvery = 0; form.remTimes = 1;
+    }
+    Actions.upsertItem(form);
+    Actions.closeModal();
+    try { await Sync.push(form); Reminders.scheduleAll(); }
+    catch (e) { Actions.toast('Save failed: ' + e.message); }
+  };
+
+  const remToggle = (form.remStart != null);
+
+  return el('div', { class: 'backdrop', onClick: e => { if (e.target.classList.contains('backdrop')) Actions.closeModal(); }},
+    el('div', { class: 'sheet' },
+      // Header
+      el('div', { class: 'sheet-hdr' },
+        el('button', { class: 'sheet-cancel', onClick: Actions.closeModal }, 'Cancel'),
+        el('div', { class: 'sheet-title' }, mode === 'new' ? 'New Item' : 'Edit Item'),
+        el('button', { class: 'sheet-save', onClick: save }, 'Save')),
+      // Body
+      el('div', { class: 'sheet-body' },
+        // Type selector
+        el('div', { class: 'type-select' },
+          ['note','todo','event'].map(t =>
+            el('button', { class: 'type-opt ' + t + (form.type === t ? ' on' : ''),
+              dataset: { t }, onClick: () => setType(t) },
+              el('span', { class: 'type-opt-ic' }, t === 'note' ? '📝' : t === 'todo' ? '○' : '📅'),
+              t.charAt(0).toUpperCase() + t.slice(1)))),
+        // Content textarea
+        el('textarea', { id: 'm-content', class: 'input',
+          placeholder: 'What\'s on your mind?',
+          rows: 4,
+          ref: ta => { ta.value = form.content; setTimeout(() => ta.focus(), 50); attachAutoBullet(ta); }}),
+        // Date/time fields
+        el('div', { class: 'field-group' },
+          el('div', { class: 'field-row' },
+            el('span', { class: 'field-label' }, 'Date'),
+            el('input', { id: 'm-date', type: 'date', value: form.date })),
+          el('div', { class: 'field-row' },
+            el('span', { class: 'field-label' }, 'Time'),
+            el('input', { id: 'm-time', type: 'time', value: form.time })),
+          el('div', { class: 'field-row', id: 'end-time-row',
+            style: { display: form.type === 'event' ? 'flex' : 'none' } },
+            el('span', { class: 'field-label' }, 'Ends'),
+            el('input', { id: 'm-endtime', type: 'time', value: form.endTime }))),
+        // Reminder
+        el('div', { class: 'field-group' },
+          el('div', { class: 'field-row' },
+            el('span', { class: 'field-label' }, '⏰  Reminder'),
+            el('div', { id: 'rem-toggle', class: 'toggle' + (remToggle ? ' on' : ''),
+              onClick: e => {
+                e.currentTarget.classList.toggle('on');
+                document.getElementById('rem-fields').style.display =
+                  e.currentTarget.classList.contains('on') ? 'block' : 'none';
+                if (e.currentTarget.classList.contains('on')) Reminders.requestPerm();
+              }})),
+          el('div', { id: 'rem-fields', style: { display: remToggle ? 'block' : 'none' } },
+            el('div', { class: 'field-row' },
+              el('span', { class: 'field-label' }, 'Notify'),
+              el('select', { id: 'rem-start', class: 'input', style: { width: 'auto', padding: '4px 8px' } },
+                [5, 10, 15, 30, 60, 120, 1440].map(min =>
+                  el('option', { value: String(min), selected: form.remStart === min }, min < 60 ? `${min} min before` : min < 1440 ? `${min/60} hr before` : '1 day before')))),
+            el('div', { class: 'field-row' },
+              el('span', { class: 'field-label' }, 'Repeat'),
+              el('select', { id: 'rem-every', class: 'input', style: { width: 'auto', padding: '4px 8px' } },
+                [0, 5, 10, 15, 30].map(min =>
+                  el('option', { value: String(min), selected: form.remEvery === min }, min === 0 ? 'Once' : `every ${min} min`))),
+              el('select', { id: 'rem-times', class: 'input', style: { width: 'auto', padding: '4px 8px', marginLeft: '8px' } },
+                [1, 2, 3, 5].map(n =>
+                  el('option', { value: String(n), selected: form.remTimes === n }, `${n}×`))))),
+        ),
+        // Attachments
+        el('div', { class: 'field-group', ref: r => { attachEl = r; } }, ...buildAttachContents()),
+        // Delete (edit only)
+        mode === 'edit' && el('button', { class: 'delete-btn', onClick: async () => {
+          if (!confirm('Delete this item?')) return;
+          Actions.deleteItem(form.id); Actions.closeModal();
+          try { await Sync.remove(form); } catch (e) { Actions.toast('Delete failed'); }
+        }}, 'Delete'))));
+};
+
+/* ContextMenu — adaptive per item */
+
+const ContextMenu = () => {
+  if (!state.ctx) return null;
+  const { x, y, item } = state.ctx;
+  const items = menuFor(item);
+
+  // Position: clamp to viewport
+  const w = 240, h = items.length * 44;
+  const left = Math.min(x, window.innerWidth - w - 12);
+  const top  = Math.min(y, window.innerHeight - h - 12);
+
+  return el('div', {},
+    el('div', { class: 'ctx-backdrop', onClick: Actions.closeCtx }),
+    el('div', { class: 'ctx-menu', style: { left: left + 'px', top: top + 'px' } },
+      items.map((mi, i) => el('div', {
+        class: 'ctx-item' + (mi.danger ? ' danger' : ''),
+        onClick: () => { Actions.closeCtx(); mi.fn(); }},
+        mi.label, mi.icon && el('span', { class: 'ctx-item-icon' }, mi.icon)))));
+};
+
+const menuFor = item => {
+  const out = [
+    { label: 'Edit', icon: '✏️', fn: () => Actions.openEdit(item.id) },
+  ];
+  if (item.type === 'todo') {
+    out.push({ label: item.completed ? 'Mark incomplete' : 'Mark complete',
+               icon: item.completed ? '○' : '✓',
+               fn: () => toggleDone(item) });
+  }
+  if (item.time && !item.completed) {
+    out.push({ label: item.remStart != null ? 'Edit reminder' : 'Add reminder',
+               icon: '⏰', fn: () => Actions.openEdit(item.id) });
+  }
+  if (item.attKind === 'image') {
+    out.push({ label: 'View image', icon: '🖼', fn: () => Attach.showImage(item.attDriveId) });
+  }
+  // Type conversions
+  ['note','todo','event'].filter(t => t !== item.type).forEach(t => {
+    out.push({ label: `Convert to ${t}`, icon: t === 'note' ? '📝' : t === 'todo' ? '○' : '📅',
+               fn: async () => {
+                 const updated = { ...item, type: t };
+                 if (t !== 'todo') updated.completed = false;
+                 Actions.upsertItem(updated);
+                 try { await Sync.push(updated); } catch (e) { Actions.toast('Failed'); }
+               }});
+  });
+  out.push({ label: 'Delete', danger: true, icon: '🗑', fn: async () => {
+    if (!confirm('Delete this item?')) return;
+    Actions.deleteItem(item.id);
+    try { await Sync.remove(item); } catch (e) { Actions.toast('Delete failed'); }
+  }});
+  return out;
+};
+
+/* CommandPalette */
+
+const CommandPalette = () => {
+  if (!state.cmd?.open) return null;
+
+  let inputEl;
+  const renderResults = (q) => {
+    const resultsEl = document.getElementById('cmd-results');
+    if (!resultsEl) return;
+    const results = computeCmdResults(q);
+    resultsEl.replaceChildren(...buildCmdRows(results));
+  };
+
+  return el('div', { class: 'cmd-backdrop', onClick: e => { if (e.target.classList.contains('cmd-backdrop')) Actions.closeCmd(); }},
+    el('div', { class: 'cmd-palette' },
+      el('div', { class: 'cmd-input' },
+        Icon.search(),
+        el('input', { type: 'text', placeholder: 'Search items, jump to date, switch view…',
+          autocomplete: 'off',
+          ref: i => { inputEl = i; setTimeout(() => i.focus(), 60); },
+          onInput: e => renderResults(e.target.value),
+          onKeydown: e => {
+            if (e.key === 'Escape') Actions.closeCmd();
+            if (e.key === 'Enter') {
+              const focused = document.querySelector('.cmd-row.focused');
+              if (focused) focused.click();
+            }
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+              e.preventDefault();
+              const rows = [...document.querySelectorAll('.cmd-row')];
+              const cur  = document.querySelector('.cmd-row.focused');
+              const idx  = cur ? rows.indexOf(cur) : -1;
+              const next = e.key === 'ArrowDown' ? rows[idx+1] || rows[0] : rows[idx-1] || rows[rows.length-1];
+              if (cur)  cur.classList.remove('focused');
+              if (next) { next.classList.add('focused'); next.scrollIntoView({ block: 'nearest' }); }
+            }
+          },
+        })),
+      el('div', { class: 'cmd-results', id: 'cmd-results' },
+        ...buildCmdRows(computeCmdResults('')))));
+};
+
+const computeCmdResults = q => {
+  const query = q.trim().toLowerCase();
+  const out = { actions: [], date: null, items: [] };
+
+  const allActions = [
+    { ic: '+', label: 'New item',     sub: 'Create note, todo or event', fn: () => { Actions.closeCmd(); Actions.openNew(); }},
+    { ic: '◎', label: 'Today',        sub: ds(today()),                  fn: () => { Actions.closeCmd(); Actions.goToday(); }},
+    { ic: 'M', label: 'Month view',   sub: 'Calendar grid',              fn: () => { Actions.closeCmd(); Actions.navigate({ name: 'month', date: state.view.date, dayMode: 'day' }); }},
+    { ic: 'D', label: 'Day view',     sub: 'Hourly timeline',            fn: () => { Actions.closeCmd(); Actions.navigate({ name: 'day', date: state.view.date, dayMode: 'day' }); }},
+    { ic: 'L', label: 'List view',    sub: 'All items',                  fn: () => { Actions.closeCmd(); Actions.navigate({ name: 'list', date: state.view.date, dayMode: 'day' }); }},
+    { ic: '⚙', label: 'Settings',    sub: 'Profile, dark mode, sign out',fn: () => { Actions.closeCmd(); Actions.openSettings(); }},
+  ];
+  out.actions = query
+    ? allActions.filter(a => a.label.toLowerCase().includes(query) || a.sub.toLowerCase().includes(query))
+    : allActions;
+
+  if (query) {
+    const d = DateParser.parse(query);
+    if (d) out.date = { d, label: DateParser.describe(d) };
+
+    out.items = [...state.items.values()]
+      .filter(i => i.content.toLowerCase().includes(query) || (i.date && i.date.includes(query)))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 8);
+  }
+  return out;
+};
+
+const buildCmdRows = results => {
+  const rows = [];
+  if (results.date) {
+    rows.push(el('div', { class: 'cmd-section' }, 'Jump to date'));
+    rows.push(el('div', { class: 'cmd-row focused', onClick: () => {
+      Actions.closeCmd();
+      Actions.navigate({ name: 'day', date: results.date.d, dayMode: 'day' });
+    }},
+      el('div', { class: 'cmd-row-ic date' }, '📅'),
+      el('div', { class: 'cmd-row-body' },
+        el('div', { class: 'cmd-row-title' }, results.date.label),
+        el('div', { class: 'cmd-row-sub' }, ds(results.date.d)))));
+  }
+  if (results.actions.length) {
+    rows.push(el('div', { class: 'cmd-section' }, 'Actions'));
+    results.actions.forEach((a, i) => rows.push(el('div', {
+      class: 'cmd-row' + (!results.date && i === 0 ? ' focused' : ''),
+      onClick: a.fn,
+    },
+      el('div', { class: 'cmd-row-ic' }, a.ic),
+      el('div', { class: 'cmd-row-body' },
+        el('div', { class: 'cmd-row-title' }, a.label),
+        el('div', { class: 'cmd-row-sub' }, a.sub)))));
+  }
+  if (results.items.length) {
+    rows.push(el('div', { class: 'cmd-section' }, 'Items'));
+    results.items.forEach(it => rows.push(el('div', {
+      class: 'cmd-row',
+      onClick: () => {
+        Actions.closeCmd();
+        if (it.date) {
+          Actions.navigate({ name: 'day', date: parseDs(it.date), dayMode: 'day' });
+        }
+        Actions.openEdit(it.id);
+      },
+    },
+      el('div', { class: 'cmd-row-ic ' + it.type }, it.type[0].toUpperCase()),
+      el('div', { class: 'cmd-row-body' },
+        el('div', { class: 'cmd-row-title' }, it.content || '(empty)'),
+        el('div', { class: 'cmd-row-sub' },
+          (it.date ? dateLabel(parseDs(it.date)) : 'No date'),
+          (it.time ? ' · ' + fmtTimeShort(it.time) : ''))))));
+  }
+  if (rows.length === 0) {
+    rows.push(el('div', { class: 'cmd-empty' }, 'No matches'));
+  }
+  return rows;
+};
+
+/* Settings */
+
+const Settings = () => {
+  if (!state.settings?.open) return null;
+  const u = state.user;
+
+  return el('div', { class: 'backdrop',
+    onClick: e => { if (e.target.classList.contains('backdrop')) Actions.closeSettings(); }},
+    el('div', { class: 'settings-panel' },
+      el('div', { class: 'settings-hdr' },
+        el('div', { class: 'sheet-title' }, 'Settings'),
+        el('button', { class: 'sheet-save', onClick: Actions.closeSettings }, 'Done')),
+      el('div', { class: 'settings-body' },
+        // Profile
+        el('div', { class: 'settings-profile' },
+          el('div', { class: 'settings-avatar' },
+            u?.picture ? el('img', { src: u.picture }) : (u?.name?.[0] || '?')),
+          el('div', { style: { flex: 1 } },
+            el('div', { class: 'settings-name' }, u?.name || 'Signed in'),
+            el('div', { class: 'settings-email' }, u?.email || ''))),
+        // Sheet link
+        el('div', { class: 'settings-list' },
+          el('a', { class: 'settings-item',
+            href: state.sheetId ? `https://docs.google.com/spreadsheets/d/${state.sheetId}` : '#',
+            target: '_blank', rel: 'noopener' },
+            '📊 ', el('span', { style: { flex: 1 } }, 'Open Google Sheet'),
+            el('span', { class: 'settings-item-arrow' }, '↗')),
+          el('div', { class: 'settings-item',
+            onClick: () => Actions.setDark(!state.dark) },
+            '🌙 ', el('span', { style: { flex: 1 } }, 'Dark Mode'),
+            el('div', { class: 'toggle' + (state.dark ? ' on' : '') }))),
+        // Sign out
+        el('div', { class: 'settings-list' },
+          el('div', { class: 'settings-item danger', onClick: () => {
+            if (confirm('Sign out?')) Auth.signOut();
+          }}, 'Sign Out')))));
 };
 
 
-/* ─── HELPERS for components ─── */
+/* ─── Auto-bullet ─── */
 
-/* All items occurring on a given date (uses Map). */
-const itemsOnDate = (date) => {
+const attachAutoBullet = ta => {
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const pos = ta.selectionStart;
+      const before = ta.value.slice(0, pos);
+      const after  = ta.value.slice(pos);
+      const lines  = before.split('\n');
+      const cur    = lines[lines.length - 1];
+      const m = cur.match(/^(\s*)([-*+]|\d+\.)\s(.*)$/);
+      if (!m) return;
+      e.preventDefault();
+      const [, indent, marker, content] = m;
+      if (!content.trim()) {
+        ta.value = before.slice(0, before.length - cur.length) + after;
+        ta.selectionStart = ta.selectionEnd = before.length - cur.length;
+      } else {
+        const next = /^\d+/.test(marker) ? (parseInt(marker) + 1) + '.' : marker;
+        const ins = '\n' + indent + next + ' ';
+        ta.value = before + ins + after;
+        ta.selectionStart = ta.selectionEnd = pos + ins.length;
+      }
+    }
+  });
+};
+
+
+/* ─── Helpers for components ─── */
+
+const itemsOnDate = date => {
   const key = ds(date);
   const out = [];
   for (const it of state.items.values()) if (it.date === key) out.push(it);
   return out;
 };
 
-/* Sort items: timed first (by time), then untimed, then events > todos > notes. */
-const sortByTime = (items) => {
+const sortByTime = items => {
   const order = { event: 0, todo: 1, note: 2 };
   return [...items].sort((a, b) => {
     if (a.time && b.time) return a.time.localeCompare(b.time);
@@ -1398,49 +2388,75 @@ const sortByTime = (items) => {
   });
 };
 
-const uniq = (arr) => [...new Set(arr)];
+const groupByDate = items => {
+  const out = {};
+  for (const it of items) {
+    const k = it.date || '';
+    (out[k] = out[k] || []).push(it);
+  }
+  for (const k in out) out[k] = sortByTime(out[k]);
+  return out;
+};
 
-/* 6×7 month grid cells anchored on the month containing `date`.
-   Returns 42 entries with { date, month } so we know which cells are out-of-month. */
-const monthCells = (date) => {
+const uniq = arr => [...new Set(arr)];
+
+const monthCells = date => {
   const first = startOfMonth(date);
-  const start = addDays(first, -first.getDay());  // back to the previous Sunday
+  const start = addDays(first, -first.getDay());
   return Array.from({ length: 42 }, (_, i) => {
     const d = addDays(start, i);
     return { date: d, month: d.getMonth() };
   });
 };
 
-const dateLabel = (d) => {
+const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+const dateLabel = d => {
   if (sameDay(d, today())) return 'Today';
   if (sameDay(d, addDays(today(), 1)))  return 'Tomorrow';
   if (sameDay(d, addDays(today(), -1))) return 'Yesterday';
   return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`;
 };
 
+const toggleDone = async item => {
+  if (item.type !== 'todo') return;
+  const updated = { ...item, completed: !item.completed };
+  Actions.upsertItem(updated);
+  try { await Sync.push(updated); }
+  catch (e) { Actions.toast('Could not save'); Actions.upsertItem(item); }
+};
 
-/* ─── 11. BOOT ──────────────────────────────────────────────────────────── */
+
+/* ─── 14. BOOT ──────────────────────────────────────────────────────────── */
+
+// Global keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); Actions.openCmd(); return; }
+  if (e.key === 'Escape') {
+    if (state.cmd?.open)         { Actions.closeCmd(); return; }
+    if (state.settings?.open)    { Actions.closeSettings(); return; }
+    if (state.modal)             { Actions.closeModal(); return; }
+    if (state.ctx)               { Actions.closeCtx(); return; }
+  }
+  // Don't intercept typing
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'n' || e.key === 'N') { e.preventDefault(); Actions.openNew(); }
+  if (e.key === '/')                  { e.preventDefault(); Actions.openCmd(); }
+});
 
 (function init() {
-  // Apply theme immediately (before anything paints).
   document.documentElement.classList.toggle('dark', state.dark);
   document.documentElement.classList.toggle('light', !state.dark);
 
-  // Show cached items instantly while we do background auth.
   Sync.restoreCache();
+  render();
 
-  // First render — splash screen.
-  renderApp();
-
-  // Auth: if we have a stored sheetId (proof of prior auth), try silent;
-  // otherwise show sign-in screen.
   if (state.sheetId) {
     Auth.whenGIS(async () => {
       const ok = await Auth.silentRefresh();
       if (ok) {
-        // Show cached UI immediately, then sync in background
         if (state.items.size > 0) Actions.setStatus('ready');
-        try { await Sync.load(); Auth.fetchUser(); Actions.setStatus('ready'); }
+        try { await Sync.load(); Auth.fetchUser(); Actions.setStatus('ready'); Reminders.scheduleAll(); }
         catch (e) { Actions.toast('Sync failed: ' + e.message); }
       } else {
         Actions.setStatus('auth');
