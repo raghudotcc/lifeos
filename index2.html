@@ -1039,6 +1039,8 @@ const SCOPE      = 'https://www.googleapis.com/auth/spreadsheets'
                + ' https://www.googleapis.com/auth/drive.metadata.readonly';
 const SHEET_NAME = 'LifeOS';
 const TAB_NAME   = 'Items';
+const LISTS_TAB  = 'Lists';
+const LISTS_HEADER = ['id','name','color','updated_at'];
 
 const HEADER = [
   'id','type','content','date','time','completed','created_at','deleted','end_time',
@@ -1128,10 +1130,12 @@ const Actions = {
     const trimmed = (name || '').trim();
     if (!trimmed) return null;
     const id = 'l_' + uid();
-    const list = { id, name: trimmed, color: 'blue' };
+    const list = { id, name: trimmed, color: 'blue', updatedAt: new Date().toISOString() };
     state.lists.set(id, list);
     state.listsVer++;
     Local.putList(list);
+    Queue.enqueue({ kind: 'list-upsert', id });
+    Sync.drainSoon();
     notify();
     return list;
   },
@@ -1141,23 +1145,28 @@ const Actions = {
     const trimmed = (name || '').trim();
     if (!trimmed) return;
     list.name = trimmed;
+    list.updatedAt = new Date().toISOString();
     state.lists.set(id, list);
     state.listsVer++;
     Local.putList(list);
+    Queue.enqueue({ kind: 'list-upsert', id });
     // Update denormalized listName on every item that points here.
     for (const it of state.items.values()) {
       if (it.listId === id && it.listName !== trimmed) {
         it.listName = trimmed;
-        Actions.upsertItem(it);   // restamps updatedAt + queues sync per item
+        Actions.upsertItem(it);
       }
     }
+    Sync.drainSoon();
     notify();
   },
   deleteList(id) {
-    if (id === DEFAULT_LIST.id) return;   // can't delete Inbox
+    if (id === DEFAULT_LIST.id) return;
+    const list = state.lists.get(id);
     state.lists.delete(id);
     state.listsVer++;
     Local.deleteList(id);
+    if (list) Queue.enqueue({ kind: 'list-delete', id, _row: list._row || null });
     // Move orphaned items to Inbox
     for (const it of state.items.values()) {
       if (it.listId === id) {
@@ -1167,6 +1176,7 @@ const Actions = {
       }
     }
     if (state.activeListId === id) Actions.setActiveList('all');
+    Sync.drainSoon();
     notify();
   },
   openListMenu(x, y) { state.listMenu = { x, y }; notify(); },
@@ -1437,15 +1447,24 @@ const Remote = (() => {
 
   const ensureTab = async () => {
     const meta = await get(`/${state.sheetId}?fields=sheets.properties`);
-    const tab = meta.sheets.find(s => s.properties.title === TAB_NAME);
-    state.tabId = (tab || meta.sheets[0]).properties.sheetId;
-    if (!tab) {
-      await post(`/${state.sheetId}:batchUpdate`, {
-        requests: [{ addSheet: { properties: { title: TAB_NAME } } }],
-      });
+    const itemsTab = meta.sheets.find(s => s.properties.title === TAB_NAME);
+    const listsTab = meta.sheets.find(s => s.properties.title === LISTS_TAB);
+    state.tabId = (itemsTab || meta.sheets[0]).properties.sheetId;
+    state.listsTabId = listsTab?.properties.sheetId ?? null;
+    const adds = [];
+    if (!itemsTab) adds.push({ addSheet: { properties: { title: TAB_NAME } } });
+    if (!listsTab) adds.push({ addSheet: { properties: { title: LISTS_TAB } } });
+    if (adds.length) {
+      const r = await post(`/${state.sheetId}:batchUpdate`, { requests: adds });
+      // Re-read sheet ids after add
+      const meta2 = await get(`/${state.sheetId}?fields=sheets.properties`);
+      state.tabId      = meta2.sheets.find(s => s.properties.title === TAB_NAME).properties.sheetId;
+      state.listsTabId = meta2.sheets.find(s => s.properties.title === LISTS_TAB).properties.sheetId;
     }
     await put(`/${state.sheetId}/values/${TAB_NAME}!A1:${SHEET_RANGE_END}1?valueInputOption=RAW`,
               { values: [HEADER] });
+    await put(`/${state.sheetId}/values/${LISTS_TAB}!A1:D1?valueInputOption=RAW`,
+              { values: [LISTS_HEADER] });
   };
 
   const fetchAll = async () => {
@@ -1485,7 +1504,47 @@ const Remote = (() => {
     await writeRow(item._row - 1, toRow(tomb));
   };
 
-  return { fetchAll, upsert, softDelete };
+  /* Lists tab */
+
+  const listToRow = l => [l.id, l.name, l.color || 'blue', l.updatedAt || new Date().toISOString()];
+  const listFromRow = (row, idx) => row[0] ? ({
+    id: row[0], name: row[1] || row[0], color: row[2] || 'blue',
+    updatedAt: row[3] || '', deleted: row[1] === '__deleted__',
+    _row: idx + 2,
+  }) : null;
+
+  const fetchLists = async () => {
+    if (!state.sheetId) return [];
+    if (!state.listsTabId) await ensureTab();
+    try {
+      const data = await get(`/${state.sheetId}/values/${LISTS_TAB}!A2:D1000`);
+      return (data.values || []).map((r, i) => listFromRow(r, i)).filter(Boolean);
+    } catch (e) { console.warn('fetchLists', e); return []; }
+  };
+
+  const writeListsRow = (rowIdx, row) =>
+    post(`/${state.sheetId}:batchUpdate`, { requests: [{ updateCells: {
+      start: { sheetId: state.listsTabId, rowIndex: rowIdx, columnIndex: 0 },
+      rows:  [{ values: row.map(v => ({ userEnteredValue: { stringValue: String(v ?? '') } })) }],
+      fields: 'userEnteredValue',
+    }}]});
+
+  const upsertList = async list => {
+    if (!state.listsTabId) await ensureTab();
+    if (!list._row) {
+      // Find next row by reading current count
+      const data = await get(`/${state.sheetId}/values/${LISTS_TAB}!A2:A1000`);
+      list._row = (data.values?.length || 0) + 2;
+    }
+    await writeListsRow(list._row - 1, listToRow(list));
+  };
+
+  const softDeleteList = async list => {
+    if (!list._row) return;
+    await writeListsRow(list._row - 1, [list.id, '__deleted__', '', new Date().toISOString()]);
+  };
+
+  return { fetchAll, upsert, softDelete, fetchLists, upsertList, softDeleteList };
 })();
 
 
@@ -1501,24 +1560,29 @@ const Sync = (() => {
 
   const setSyncStatus = s => { if (state.syncStatus !== s) { state.syncStatus = s; notify(); } };
 
+  let _draining = false;
   const drain = async () => {
+    if (_draining) return;
     if (!state.token || !navigator.onLine) {
       setSyncStatus(navigator.onLine ? 'idle' : 'offline');
       return;
     }
+    _draining = true;
     setSyncStatus('syncing');
     let ops;
     try { ops = await Queue.all(); }
-    catch (e) { console.warn('Queue read failed', e); setSyncStatus('error'); return; }
-    if (!ops.length) { state.pendingCount = 0; setSyncStatus('idle'); notify(); return; }
+    catch (e) { console.warn('Queue read failed', e); setSyncStatus('error'); _draining = false; return; }
+    if (!ops.length) { state.pendingCount = 0; setSyncStatus('idle'); _draining = false; notify(); return; }
 
-    // Coalesce: keep only the latest op per item id; preserve order otherwise.
+    // Coalesce per (kind-bucket, id): only the latest op for each (item|list, id) gets executed.
     const latest = new Map();
-    for (const op of ops) latest.set(op.id, op);
+    const keyOf = op => (op.kind.startsWith('list-') ? 'L:' : 'I:') + op.id;
+    for (const op of ops) latest.set(keyOf(op), op);
 
     let failed = false;
+    console.log('[sync] draining', ops.length, 'ops');
     for (const op of ops) {
-      const keep = latest.get(op.id) === op;
+      const keep = latest.get(keyOf(op)) === op;
       try {
         if (!keep) {
           await Queue.remove(op.seq);
@@ -1526,31 +1590,61 @@ const Sync = (() => {
         }
         if (op.kind === 'upsert') {
           const it = state.items.get(op.id);
-          if (it) { await Remote.upsert(it); Local.putItem(it); }
+          if (it) {
+            await Remote.upsert(it);
+            await Local.putItem(it);   // persist updated _row
+          }
         } else if (op.kind === 'delete') {
           if (op._row) await Remote.softDelete({ _row: op._row, id: op.id });
+        } else if (op.kind === 'list-upsert') {
+          const ls = state.lists.get(op.id);
+          if (ls) { await Remote.upsertList(ls); await Local.putList(ls); }
+        } else if (op.kind === 'list-delete') {
+          if (op._row) await Remote.softDeleteList({ _row: op._row, id: op.id });
         }
         await Queue.remove(op.seq);
       } catch (e) {
-        console.warn('Sync op failed', op, e);
+        console.warn('[sync] op failed', op, e);
         failed = true;
-        break;   // stop draining on first failure to preserve order
+        break;
       }
     }
-    state.pendingCount = (await Queue.all()).length;
+    const remaining = await Queue.all();
+    state.pendingCount = remaining.length;
     setSyncStatus(failed ? 'error' : 'idle');
+    _draining = false;
     notify();
+    console.log('[sync] drain complete, remaining:', remaining.length);
   };
 
   // Pull from remote, merge into IDB+state by updatedAt (last-write-wins).
+  let _pulling = false;
   const pull = async () => {
+    if (_pulling) return;
     if (!state.token) return;
+    _pulling = true;
     setSyncStatus('syncing');
-    let remote;
-    try { remote = await Remote.fetchAll(); }
-    catch (e) { console.warn('Pull failed', e); setSyncStatus('error'); return; }
+    let remote, remoteLists;
+    try {
+      [remote, remoteLists] = await Promise.all([Remote.fetchAll(), Remote.fetchLists()]);
+    }
+    catch (e) { console.warn('[sync] pull failed', e); setSyncStatus('error'); _pulling = false; return; }
 
-    let changed = false;
+    let changed = false, listsChanged = false;
+
+    // Lists merge first so item.listName lookups have the canonical list set.
+    for (const rL of remoteLists) {
+      const local = state.lists.get(rL.id);
+      const remoteWins = !local || (rL.updatedAt || '') > (local.updatedAt || '');
+      if (rL.deleted) {
+        if (local && rL.id !== DEFAULT_LIST.id) { state.lists.delete(rL.id); Local.deleteList(rL.id); listsChanged = true; }
+      } else if (remoteWins) {
+        state.lists.set(rL.id, rL); Local.putList(rL); listsChanged = true;
+      } else if (local && local._row !== rL._row) {
+        local._row = rL._row; Local.putList(local); listsChanged = true;
+      }
+    }
+
     for (const rIt of remote) {
       const local = state.items.get(rIt.id);
       const localTs = local?.updatedAt || '';
@@ -1563,18 +1657,20 @@ const Sync = (() => {
           state.items.set(rIt.id, rIt); Local.putItem(rIt); changed = true;
         }
       } else if (local && local._row !== rIt._row) {
-        // Keep our content but adopt the row pointer (sheet may have re-sorted).
         local._row = rIt._row; Local.putItem(local); changed = true;
       }
-      // Track derived lists (any listId we see on a remote item that we don't know about).
+      // Derived lists from items (covers case where Lists tab is missing entries).
       if (!rIt.deleted && rIt.listId && !state.lists.has(rIt.listId)) {
-        const ls = { id: rIt.listId, name: rIt.listName || rIt.listId, color: 'blue' };
-        state.lists.set(ls.id, ls); Local.putList(ls); state.listsVer++;
+        const ls = { id: rIt.listId, name: rIt.listName || rIt.listId, color: 'blue', updatedAt: rIt.updatedAt || '' };
+        state.lists.set(ls.id, ls); Local.putList(ls); listsChanged = true;
       }
     }
     if (changed) state.itemsVer++;
+    if (listsChanged) state.listsVer++;
     setSyncStatus('idle');
+    _pulling = false;
     notify();
+    console.log('[sync] pull complete: items', remote.length, 'lists', remoteLists.length);
   };
 
   // Boot: open IDB, load items+lists+queue counts into state.
@@ -2187,9 +2283,10 @@ const render = () => {
     pc: state.pendingCount,
   }, buildAppTree);
 
-  // Modal
+  // Modal — slot signature deliberately excludes listsVer/itemsVer:
+  // modal owns its own form state; re-rendering would wipe user input.
   Slots.slot('modalRoot',
-    state.modal ? { mode: state.modal.mode, id: state.modal.item.id, lv: state.listsVer } : null,
+    state.modal ? { mode: state.modal.mode, id: state.modal.item.id } : null,
     () => Modal());
 
   // Context menu
@@ -2509,6 +2606,7 @@ const TimelineEvent = (item, multi) => {
     const updated = { ...item, time: fmt(curStart) };
     if (hasEnd) updated.endTime = fmt(curStart + curDur);
     if (colChanged) updated.date = ds(multi.days[curCol]);
+    console.log('[drag] commit', { id: updated.id, time: updated.time, date: updated.date, _row: updated._row });
     Actions.upsertItem(updated);
   };
 
@@ -3047,7 +3145,15 @@ const Settings = () => {
           el('div', { class: 'settings-item',
             onClick: () => Actions.setDark(!state.dark) },
             '🌙 ', el('span', { style: { flex: 1 } }, 'Dark Mode'),
-            el('div', { class: 'toggle' + (state.dark ? ' on' : '') }))),
+            el('div', { class: 'toggle' + (state.dark ? ' on' : '') })),
+          el('div', { class: 'settings-item',
+            onClick: async () => {
+              Actions.toast('Syncing…');
+              try { await Sync.drain(); await Sync.pull(); Actions.toast('Synced'); }
+              catch (e) { Actions.toast('Sync failed: ' + e.message); }
+            }},
+            '🔄 ', el('span', { style: { flex: 1 } }, 'Force Sync'),
+            state.pendingCount > 0 && el('span', { class: 'settings-item-arrow' }, `${state.pendingCount} pending`))),
         // Lists
         el('div', { class: 'settings-section-hdr' }, 'Lists'),
         el('div', { class: 'settings-list' },
@@ -3201,9 +3307,17 @@ document.addEventListener('keydown', e => {
   if (haveCachedApp) state.status = 'ready';
   render();
 
-  // Re-drain queue and re-pull on focus / online.
+  // Re-drain queue and re-pull on focus / online / page-visibility-change.
   addEventListener('online',  () => Sync.drainSoon());
   addEventListener('focus',   () => { Sync.drainSoon(); if (state.token) Sync.pull(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      Sync.drainSoon();
+      if (state.token) Sync.pull();
+    }
+  });
+  // Safety-net: drain every 60s while signed in, in case some op got stuck.
+  setInterval(() => { if (state.token && navigator.onLine) Sync.drainSoon(); }, 60_000);
 
   if (state.sheetId) {
     Auth.whenGIS(async ok => {
