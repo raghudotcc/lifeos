@@ -676,11 +676,13 @@ html.dark .tl-event.event { background: rgba(191,90,242,.18); }
 .field-row input[type="date"], .field-row input[type="time"] {
   background: transparent; color: var(--t-1); padding: 4px 6px;
   font-size: 16px; text-align: right;
-  min-width: 110px; min-height: 28px;
-  -webkit-appearance: none; appearance: none;
+  min-height: 28px;
   border: 0.5px solid var(--sep-th); border-radius: 6px;
+  flex: 0 0 auto;
 }
-.field-row input[type="time"] { min-width: 92px; }
+.field-row input[type="date"] { width: 140px; }
+.field-row input[type="time"] { width: 92px; }
+.is-hidden { display: none !important; }
 .field-row input[type="date"]::-webkit-calendar-picker-indicator,
 .field-row input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(.5);
@@ -2761,8 +2763,8 @@ const Modal = () => {
       ['note','todo','event'].forEach(c => b.classList.remove(c));
       b.classList.add(b.dataset.t);
     });
-    document.getElementById('time-row').style.display    = t === 'note'  ? 'none' : 'flex';
-    document.getElementById('end-time-row').style.display = t === 'event' ? 'flex' : 'none';
+    document.getElementById('time-row').classList.toggle('is-hidden', t === 'note');
+    document.getElementById('end-time-row').classList.toggle('is-hidden', t !== 'event');
   };
 
   const save = async () => {
@@ -2824,12 +2826,10 @@ const Modal = () => {
           el('div', { class: 'field-row' },
             el('span', { class: 'field-label' }, 'Date'),
             el('input', { id: 'm-date', type: 'date', value: form.date })),
-          el('div', { class: 'field-row', id: 'time-row',
-            style: { display: form.type === 'note' ? 'none' : 'flex' } },
+          el('div', { class: 'field-row' + (form.type === 'note' ? ' is-hidden' : ''), id: 'time-row' },
             el('span', { class: 'field-label' }, 'Time'),
             el('input', { id: 'm-time', type: 'time', value: form.time })),
-          el('div', { class: 'field-row', id: 'end-time-row',
-            style: { display: form.type === 'event' ? 'flex' : 'none' } },
+          el('div', { class: 'field-row' + (form.type !== 'event' ? ' is-hidden' : ''), id: 'end-time-row' },
             el('span', { class: 'field-label' }, 'Ends'),
             el('input', { id: 'm-endtime', type: 'time', value: form.endTime }))),
         // Reminder
