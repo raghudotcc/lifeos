@@ -674,9 +674,13 @@ html.dark .tl-event.event { background: rgba(191,90,242,.18); }
 .field-label { color: var(--t-1); flex: 1; }
 .field-value { color: var(--t-2); }
 .field-row input[type="date"], .field-row input[type="time"] {
-  background: transparent; color: var(--t-1); padding: 4px;
+  background: transparent; color: var(--t-1); padding: 4px 6px;
   font-size: 16px; text-align: right;
+  min-width: 110px; min-height: 28px;
+  -webkit-appearance: none; appearance: none;
+  border: 0.5px solid var(--sep-th); border-radius: 6px;
 }
+.field-row input[type="time"] { min-width: 92px; }
 .field-row input[type="date"]::-webkit-calendar-picker-indicator,
 .field-row input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(.5);
@@ -2757,6 +2761,7 @@ const Modal = () => {
       ['note','todo','event'].forEach(c => b.classList.remove(c));
       b.classList.add(b.dataset.t);
     });
+    document.getElementById('time-row').style.display    = t === 'note'  ? 'none' : 'flex';
     document.getElementById('end-time-row').style.display = t === 'event' ? 'flex' : 'none';
   };
 
@@ -2765,8 +2770,8 @@ const Modal = () => {
     if (!content) return Actions.toast('Enter some text');
     form.content = content;
     form.date = document.getElementById('m-date').value;
-    form.time = document.getElementById('m-time').value;
-    form.endTime = document.getElementById('m-endtime').value;
+    form.time = form.type === 'note' ? '' : document.getElementById('m-time').value;
+    form.endTime = form.type === 'event' ? document.getElementById('m-endtime').value : '';
     const listSel = document.getElementById('m-list');
     if (listSel) {
       form.listId = listSel.value;
@@ -2819,7 +2824,8 @@ const Modal = () => {
           el('div', { class: 'field-row' },
             el('span', { class: 'field-label' }, 'Date'),
             el('input', { id: 'm-date', type: 'date', value: form.date })),
-          el('div', { class: 'field-row' },
+          el('div', { class: 'field-row', id: 'time-row',
+            style: { display: form.type === 'note' ? 'none' : 'flex' } },
             el('span', { class: 'field-label' }, 'Time'),
             el('input', { id: 'm-time', type: 'time', value: form.time })),
           el('div', { class: 'field-row', id: 'end-time-row',
